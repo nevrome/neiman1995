@@ -25,54 +25,74 @@ library(magrittr)
 
 - $k$: amount of variants
 - $N$: population size
+- $t$: time / number of iterations
 
 ```{r drift_simulation, echo=FALSE}
 inputPanel(
   sliderInput("k", label = "k",
                min = 1, max = 10, value = 10, step = 1),
   sliderInput("N", label = "N",
-               min = 10, max = 100, value = 20, step = 10)
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_final", label = "t",
+             min = 50, max = 200, value = 100, step = 10),
+  actionButton("run_button_drift_simulation", "Run simulation")
+)
+
+drift_simulation_plot <- eventReactive(
+  input$run_button_drift_simulation, {
+    k <- input$k
+    N <- input$N
+    t_final <- input$t_final
+    
+    population <- 1:N
+    variants <- 1:k
+    timesteps <- 2:t_final
+    
+    pop0 <- tibble::tibble(
+      time = as.integer(1),
+      individual = 1:N,
+      variant = rep_len(1:k, N)
+    )
+    
+    pop_devel <- list()
+    pop_devel[[1]] <- pop0
+    
+    for (p1 in timesteps) {
+      pop_new <- pop_devel[[p1 - 1]] 
+      pop_new$time <- p1
+      pop_new$variant <- sample(pop_new$variant, length(pop_new$variant), replace = T)
+      pop_devel[[p1]] <- pop_new
+    }
+    
+    pop_devel_df <- do.call(rbind, pop_devel)
+    
+    pop_devel_sum <- pop_devel_df %>%
+      dplyr::group_by(
+        time, variant
+      ) %>%
+      dplyr::summarise(
+        individuals_with_variant = n()
+      ) %>%
+      dplyr::ungroup() %>%
+      # that's just to fil gaps in the area plot
+      tidyr::complete(
+        time, 
+        variant, 
+        fill = list(individuals_with_variant = as.integer(0))
+      )
+    
+    pop_devel_sum %>%
+      ggplot() +
+      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+      theme_bw() +
+      xlab("time / number of iterations") +
+      ylab("variants and their occurence in the population [%]")
+  }
 )
 
 renderPlot({
-  k <- input$k
-  N <- input$N
-  t_final <- 200
-  
-  population <- 1:N
-  variants <- 1:k
-  timesteps <- 2:t_final
-  
-  pop0 <- tibble::tibble(
-    time = as.integer(1),
-    individual = 1:N,
-    variant = rep_len(1:k, N)
-  )
-  
-  pop_devel <- list()
-  pop_devel[[1]] <- pop0
-  
-  for (p1 in timesteps) {
-    pop_new <- pop_devel[[p1 - 1]] 
-    pop_new$time <- p1
-    pop_new$variant <- sample(pop_new$variant, length(pop_new$variant), replace = T)
-    pop_devel[[p1]] <- pop_new
-  }
-  
-  pop_devel_df <- do.call(rbind, pop_devel)
-  
-  pop_devel_sum <- pop_devel_df %>%
-    dplyr::group_by(
-      time, variant
-    ) %>%
-    dplyr::summarise(
-      individuals_with_variant = n()
-    )
-  
-  pop_devel_sum %>%
-    ggplot() +
-    geom_area(aes(time, individuals_with_variant)) +
-    facet_grid(variant ~ .)
+  drift_simulation_plot()
 })
 ```
 

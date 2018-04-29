@@ -10,5 +10,6 @@ Imports:
   rmarkdown,
   rsconnect,
   shiny,
-  tibble
+  tibble,
+  tidyr
   
