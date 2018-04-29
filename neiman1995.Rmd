@@ -2,7 +2,9 @@
 title: "Visualizing Neimans 'Stylistic variation in evolutionary perspective'"
 author: "Clemens Schmid"
 date: "April 26, 2018"
-output: html_document
+output: 
+  html_document:
+    css: styles.css
 runtime: shiny
 ---
 

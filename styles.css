@@ -1,0 +1,10 @@
+/*create an equation counter variable */
+
+body {
+   counter-reset:  EQU_COUNT 0 ;
+}
+
+.MathJax_Display:before {
+      content: "(" counter(EQU_COUNT) ")\00a0\00a0\00a0";    
+      counter-increment: EQU_COUNT;           
+    }
