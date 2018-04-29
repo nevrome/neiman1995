@@ -1,0 +1,9 @@
+language: r
+script:
+- R -e 'install.packages("rsconnect")'
+- R -e 'shinyappsiotoken <- Sys.getenv("shinyappsiotoken"); shinyappsiosecret <- Sys.getenv("shinyappsiosecret"); rsconnect::setAccountInfo(name = "nevrome", token = shinyappsiotoken, secret = shinyappsiosecret)'
+- R -e 'rsconnect::deployApp(launch.browser = FALSE)'
+env:
+  global:
+  - secure: u4L57PJLejoMsJV3+uZvYv34s4IeS/wMTtBVh58qCPS2LYEIvMVpvZJK1nMiplHmr0b4yMsphJtLjiu/ZJcLdIAp3j4HiXRDq+zHxfn1UfLWAWxrx04lCq3ozsvZmziOw3wqaafm6WvYAE6P/hnidTBvlUgCYxpgkofoMmO1kqQiw29BhG6lLT6MvB7fVx+m7GN+VjxeRWAyjExe0RTWVsFQe/gggcUm1PHZ2YwhGEBrB/PZOvpktAV0Ipqf+tx0xEYB1zYvCmqjnYN6+nescVBTFZPgZCQa8VVvDaoHHB3O8PXf1xKOA2ydWJuV4P/miJD4KdYPFNC50UHfa+n73AiDUiNVc7x4iO/BwPuLbQN1VHPHTvzmb6FKVuRlCo+cfRCl2CKLZ19mAeVyOQuDBb+OmLO84S/2g/UAVeZl8Sf+qS5JlVasK8xE8r6Z+v+pfGsxRvQMzWsL5bNkF+txgQ7D4MqHTEl6Gyhamu6JoAZx19JuPRvv3/4jFUnuJOc8/6JJ/sKcGAfLeNidsXTrCF+Xv0H14Bh8zxRwu3JefZzlpPjMMkEbka5egLBCwLEQuEghNeQI4DHGeg2OrDCrqBR27ICdW8pB74aGULTOkjiiem3df41usbkCiTcze33OViVCiHv/3/UvC82lXsXQVjhrX1jPx7JMvhF/9XUCnOg=
+  - secure: iyYmM6Iu8SyMay2deCtZlfIviSxNMPmSinUcID7sqjhQGqk6TzH/YMJMG5qGn9a368fp+yKZ8fVgri9foWz7a0dtZyPmLfDlMG7+w/e1Mw2FwyNch62TTDJAK3Wk3bnNrg1Osbilzlvk2pTgYI93eiBVTWPC5rfamz+f3m55KkUAkbFgvAFJj4+zHdc446X62pzWrQQtV2iVjWL4waY1/5IlpXCg2CkoYLRrEKkx/QicRKI6IiDIF/7qeh4U5mN/JIP5IGPnQCOzvCp0L3u6yORZzLH3Gu4qwhsKv91PcQkD6ycdWIXBtBvsl9PiHoKPXBmGUbXebYVz8aDorJcnBSc4SLUWT9EnmTXzddPs/Jx8NXzxjNAkEgW0QWng+zuGZSpg/6DqAoc52fth5tpAuP5RgHXEdK7Ryq/fr5BqoRsYXHr6YKObBGBT6nwEfmbJ0vNmo793R5BWjlUYZbTCFTB+rLUZdy5jFqJw2MMY2Aah8R5Ee5Hqi/OEHYwnuyiyaPEMMnRBmzeDD5bQptFcieUBSKTp50XsV/+KthdTQ8H4UOnvNN18orkUxdKTGgD7By7Z9CPGQX4+hBoQj/C3B+B7y//IsnxOhdHYQOKQBwyI9w5SC/6MZgkw44LMsyaUn3VGQzxcVn9vY4EAqvCNmx2Pp0EzjMzROIcdC5oPxxo=
