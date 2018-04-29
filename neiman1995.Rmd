@@ -129,9 +129,10 @@ renderPlot({
     Ft <- this_Ft
   ) %>%
     ggplot() +
-    geom_hline(aes(yintercept = 1), color = "darkblue") +
-    geom_hline(aes(yintercept = 0), color = "darkblue") +
-    geom_line(aes(t, Ft))
+    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_line(aes(t, Ft), size = 1) +
+    theme_bw()
 })
 ```
 
@@ -252,9 +253,10 @@ renderPlot({
     Ft <- this_Ft_2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "darkblue") +
-    geom_hline(aes(yintercept = 0), color = "darkblue") +
-    geom_line(aes(t, Ft))
+    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_line(aes(t, Ft), size = 1) +
+    theme_bw()
 })
 ```
 
@@ -291,9 +293,10 @@ renderPlot({
     Fhat <- this_Fhat
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "darkblue") +
-    geom_hline(aes(yintercept = 0), color = "darkblue") +
-    geom_line(aes(theta, Fhat))
+    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_line(aes(theta, Fhat), size = 1) +
+    theme_bw()
 })
 ```
 
@@ -320,10 +323,14 @@ renderPlot({
     Fhat_mean = (Fhat_min + Fhat_max) / 2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "darkblue") +
-    geom_hline(aes(yintercept = 0), color = "darkblue") +
-    geom_ribbon(aes(x = amount_of_variants, ymin = Fhat_min, ymax = Fhat_max)) +
-    geom_line(aes(x = amount_of_variants, y = Fhat_mean), color = "blue")
+    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_ribbon(
+      aes(x = amount_of_variants, ymin = Fhat_min, ymax = Fhat_max), 
+      fill = "deepskyblue", alpha = 0.5
+    ) +
+    geom_line(aes(x = amount_of_variants, y = Fhat_mean), color = "black", size = 1) +
+    theme_bw()
 })
 ```
 
@@ -353,8 +360,9 @@ renderPlot({
     ne = sapply(theta, function(x) {ne(x)})
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "darkblue") +
-    geom_line(aes(theta, ne))
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_line(aes(theta, ne), , size = 1) +
+    theme_bw()
 })
 ```
 
@@ -383,9 +391,13 @@ renderPlot({
     theta_F_mean = (theta_F_min + theta_F_max) / 2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "darkblue") +
-    geom_ribbon(aes(x = amount_of_variants, ymin = theta_F_min, ymax = theta_F_max)) +
-    geom_line(aes(x = amount_of_variants, y = theta_F_mean), color = "blue")
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_ribbon(
+      aes(x = amount_of_variants, ymin = theta_F_min, ymax = theta_F_max), 
+      fill = "deepskyblue", alpha = 0.5
+    ) +
+    geom_line(aes(x = amount_of_variants, y = theta_F_mean), size = 1) +
+    theme_bw()
 })
 ```
 
@@ -429,8 +441,9 @@ renderPlot({
     Ek = purrr::map2_dbl(n, theta, function(a, b) {Ek(a, b)})
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "darkblue") +
-    geom_line(aes(theta, Ek))
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_line(aes(theta, Ek), size = 1) +
+    theme_bw()
 })
 ```
 
