@@ -17,7 +17,9 @@ library(ggplot2)
 library(magrittr)
 ```
 
-# Drift simulation
+### Drift, Innovation and Diversity
+
+#### Temporal Dynamics of Drift *p.10*
 
 - $k$: amount of variants
 - $N$: population size
@@ -72,7 +74,7 @@ renderPlot({
 })
 ```
 
-# Drift
+#### Homogeneity Under Drift *p.10-12*
 
 The amount of increase in homogeneity in each time period is inversely proportional to the effective population size.
 
@@ -111,43 +113,9 @@ renderPlot({
 })
 ```
 
-# Innovation
-
-$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
+#### Temporal Dynamics of Drift and Innovation *p.12-14*
 
 - $μ$: innovation rate
-
-```{r innovation, echo=FALSE}
-Ft_2 <- function(F0, Ne, t, mu) {
-  if(t == 0) {return(F0)}
-  (1/Ne + (1 - 1/Ne) * Ft_2(F0, Ne, t - 1, mu)) * (1 - mu)^2
-}
-
-inputPanel(
-  sliderInput("F0_2", label = "F0 (Ft for t == 0)",
-               min = 0, max = 1, value = 0.5, step = 0.05),
-  sliderInput("Ne_2", label = "Ne",
-               min = 10, max = 100, value = 10, step = 10),
-  sliderInput("mu_2", label = "μ",
-               min = 0, max = 1, value = 0.5, step = 0.05)
-)
-
-renderPlot({
-  this_t_2 = 1:100
-  this_Ft_2 <- sapply(this_t_2, function(x) {Ft_2(input$F0_2, input$Ne_2, x, input$mu_2)})
-  
-  data.frame(
-    t = this_t_2,
-    Ft <- this_Ft_2
-  ) %>%
-    ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "red") +
-    geom_hline(aes(yintercept = 0), color = "red") +
-    geom_line(aes(t, Ft))
-})
-```
-
-# Drift simulation with Innovation
 
 ```{r drift_simulation_innovation, echo=FALSE}
 inputPanel(
@@ -210,7 +178,39 @@ renderPlot({
 })
 ```
 
-# General form for small μ
+#### Homogeneity Under Drift and Innovation *p.14*
+
+$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
+
+```{r innovation, echo=FALSE}
+Ft_2 <- function(F0, Ne, t, mu) {
+  if(t == 0) {return(F0)}
+  (1/Ne + (1 - 1/Ne) * Ft_2(F0, Ne, t - 1, mu)) * (1 - mu)^2
+}
+
+inputPanel(
+  sliderInput("F0_2", label = "F0 (Ft for t == 0)",
+               min = 0, max = 1, value = 0.5, step = 0.05),
+  sliderInput("Ne_2", label = "Ne",
+               min = 10, max = 100, value = 10, step = 10),
+  sliderInput("mu_2", label = "μ",
+               min = 0, max = 1, value = 0.5, step = 0.05)
+)
+
+renderPlot({
+  this_t_2 = 1:100
+  this_Ft_2 <- sapply(this_t_2, function(x) {Ft_2(input$F0_2, input$Ne_2, x, input$mu_2)})
+  
+  data.frame(
+    t = this_t_2,
+    Ft <- this_Ft_2
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 1), color = "red") +
+    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_line(aes(t, Ft))
+})
+```
 
 $$\hat{F} \simeq \frac{1}{2 N_e μ + 1}$$
 
@@ -249,8 +249,6 @@ renderPlot({
 })
 ```
 
-# Homogeneity as a function of the relative frequency of variants in it
-
 $$\hat{F} = \sum_{i=1}^{k} p^2_i$$
 
 - $p_i$: relative frequency of the i'th variant in the population 
@@ -281,7 +279,7 @@ renderPlot({
 })
 ```
 
-# Diversity
+#### Diversity *p.14-15*
 
 Estimating diversity within a population in these terms means that the population contains the same amount of diversity as would be found in an imaginary population with the effective number of variants at equal frequency.
 
@@ -343,7 +341,9 @@ renderPlot({
 })
 ```
 
-# Ewens
+### Archaeological Application
+
+#### Diversity and Sample Size *p.15-16*
 
 $$E(k) = \sum_{i=0}^{n-1} \frac{θ}{θ + i}$$
 
@@ -383,3 +383,13 @@ renderPlot({
     geom_line(aes(theta, Ek))
 })
 ```
+
+### Drift, Intergroup Transmission, and Interassemblage Distance 
+
+#### Dynamics of Stylistic Distance between Two Groups *p.21-24*
+
+#### Stylistic Distances for Multiple Groups *p.24-25*
+
+### Woodland Interassemblage Distance
+
+#### Diversity and Distance for Individual Assemblages *p.26-27*
