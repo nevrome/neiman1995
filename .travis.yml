@@ -3,7 +3,7 @@ r:
   - oldrel
 
 install:
-- R -e 'install.packages("rsconnect")'
+- R -e 'devtools::install_deps(dep = T)'
 
 script:
 - R -e 'shinyappsiotoken <- Sys.getenv("shinyappsiotoken"); shinyappsiosecret <- Sys.getenv("shinyappsiosecret"); rsconnect::setAccountInfo(name = "nevrome", token = shinyappsiotoken, secret = shinyappsiosecret)'
