@@ -1,8 +1,14 @@
 language: r
-script:
+r:
+  - oldrel
+
+install:
 - R -e 'install.packages("rsconnect")'
+
+script:
 - R -e 'shinyappsiotoken <- Sys.getenv("shinyappsiotoken"); shinyappsiosecret <- Sys.getenv("shinyappsiosecret"); rsconnect::setAccountInfo(name = "nevrome", token = shinyappsiotoken, secret = shinyappsiosecret)'
 - R -e 'rsconnect::deployApp(launch.browser = FALSE)'
+
 env:
   global:
   - secure: u4L57PJLejoMsJV3+uZvYv34s4IeS/wMTtBVh58qCPS2LYEIvMVpvZJK1nMiplHmr0b4yMsphJtLjiu/ZJcLdIAp3j4HiXRDq+zHxfn1UfLWAWxrx04lCq3ozsvZmziOw3wqaafm6WvYAE6P/hnidTBvlUgCYxpgkofoMmO1kqQiw29BhG6lLT6MvB7fVx+m7GN+VjxeRWAyjExe0RTWVsFQe/gggcUm1PHZ2YwhGEBrB/PZOvpktAV0Ipqf+tx0xEYB1zYvCmqjnYN6+nescVBTFZPgZCQa8VVvDaoHHB3O8PXf1xKOA2ydWJuV4P/miJD4KdYPFNC50UHfa+n73AiDUiNVc7x4iO/BwPuLbQN1VHPHTvzmb6FKVuRlCo+cfRCl2CKLZ19mAeVyOQuDBb+OmLO84S/2g/UAVeZl8Sf+qS5JlVasK8xE8r6Z+v+pfGsxRvQMzWsL5bNkF+txgQ7D4MqHTEl6Gyhamu6JoAZx19JuPRvv3/4jFUnuJOc8/6JJ/sKcGAfLeNidsXTrCF+Xv0H14Bh8zxRwu3JefZzlpPjMMkEbka5egLBCwLEQuEghNeQI4DHGeg2OrDCrqBR27ICdW8pB74aGULTOkjiiem3df41usbkCiTcze33OViVCiHv/3/UvC82lXsXQVjhrX1jPx7JMvhF/9XUCnOg=
