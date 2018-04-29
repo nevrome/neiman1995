@@ -1,0 +1,385 @@
+---
+title: "Visualizing Neimans 'Stylistic variation in evolutionary perspective'"
+author: "Clemens Schmid"
+date: "April 26, 2018"
+output: html_document
+runtime: shiny
+---
+
+This document visualizes the general model functions in Fraser D. Neimans article *Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages* from 1995. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo = FALSE}
+library(ggplot2)
+library(magrittr)
+```
+
+# Drift simulation
+
+- $k$: amount of variants
+- $N$: population size
+
+```{r drift_simulation, echo=FALSE}
+inputPanel(
+  sliderInput("k", label = "k",
+               min = 1, max = 10, value = 10, step = 1),
+  sliderInput("N", label = "N",
+               min = 10, max = 100, value = 20, step = 10)
+)
+
+renderPlot({
+  k <- input$k
+  N <- input$N
+  t_final <- 200
+  
+  population <- 1:N
+  variants <- 1:k
+  timesteps <- 2:t_final
+  
+  pop0 <- tibble::tibble(
+    time = as.integer(1),
+    individual = 1:N,
+    variant = rep_len(1:k, N)
+  )
+  
+  pop_devel <- list()
+  pop_devel[[1]] <- pop0
+  
+  for (p1 in timesteps) {
+    pop_new <- pop_devel[[p1 - 1]] 
+    pop_new$time <- p1
+    pop_new$variant <- sample(pop_new$variant, length(pop_new$variant), replace = T)
+    pop_devel[[p1]] <- pop_new
+  }
+  
+  pop_devel_df <- do.call(rbind, pop_devel)
+  
+  pop_devel_sum <- pop_devel_df %>%
+    dplyr::group_by(
+      time, variant
+    ) %>%
+    dplyr::summarise(
+      individuals_with_variant = n()
+    )
+  
+  pop_devel_sum %>%
+    ggplot() +
+    geom_area(aes(time, individuals_with_variant)) +
+    facet_grid(variant ~ .)
+})
+```
+
+# Drift
+
+The amount of increase in homogeneity in each time period is inversely proportional to the effective population size.
+
+$$F_t = \frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}$$
+
+- $F_t$: within-population homogeneity (probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant) at a certain timestep
+- $F_{t - 1}$: there is always a chance that this second individual's model learned from the same model as did the first individual's model in a still earlier time period
+- $t$: time
+- $N_e$: size of the effective population
+
+```{r drift, echo=FALSE}
+Ft <- function(F0, Ne, t) {
+  if(t == 0) {return(F0)}
+  1/Ne + (1 - 1/Ne) * Ft(F0, Ne, t - 1)
+}
+
+inputPanel(
+  sliderInput("F0", label = "F0 (Ft for t == 0)",
+               min = 0, max = 1, value = 0.5, step = 0.05),
+  sliderInput("Ne", label = "Ne",
+               min = 10, max = 100, value = 10, step = 10)
+)
+
+renderPlot({
+  this_t = 1:100
+  this_Ft <- sapply(this_t, function(x) {Ft(input$F0, input$Ne, x)})
+  
+  data.frame(
+    t = this_t,
+    Ft <- this_Ft
+  ) %>%
+    ggplot() +
+    geom_hline(aes(yintercept = 1), color = "red") +
+    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_line(aes(t, Ft))
+})
+```
+
+# Innovation
+
+$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
+
+- $μ$: innovation rate
+
+```{r innovation, echo=FALSE}
+Ft_2 <- function(F0, Ne, t, mu) {
+  if(t == 0) {return(F0)}
+  (1/Ne + (1 - 1/Ne) * Ft_2(F0, Ne, t - 1, mu)) * (1 - mu)^2
+}
+
+inputPanel(
+  sliderInput("F0_2", label = "F0 (Ft for t == 0)",
+               min = 0, max = 1, value = 0.5, step = 0.05),
+  sliderInput("Ne_2", label = "Ne",
+               min = 10, max = 100, value = 10, step = 10),
+  sliderInput("mu_2", label = "μ",
+               min = 0, max = 1, value = 0.5, step = 0.05)
+)
+
+renderPlot({
+  this_t_2 = 1:100
+  this_Ft_2 <- sapply(this_t_2, function(x) {Ft_2(input$F0_2, input$Ne_2, x, input$mu_2)})
+  
+  data.frame(
+    t = this_t_2,
+    Ft <- this_Ft_2
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 1), color = "red") +
+    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_line(aes(t, Ft))
+})
+```
+
+# Drift simulation with Innovation
+
+```{r drift_simulation_innovation, echo=FALSE}
+inputPanel(
+  sliderInput("k_2", label = "k",
+               min = 1, max = 10, value = 10, step = 1),
+  sliderInput("N_2", label = "N",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("mu_sim", label = "μ",
+               min = 0, max = 0.005, value = 0.0005, step = 0.0005)
+)
+
+renderPlot({
+  k <- input$k_2
+  N <- input$N_2
+  t_final <- 200
+  mu_sim <- input$mu_sim
+
+  population <- 1:N
+  variants <- 1:k
+  timesteps <- 2:t_final
+
+  pop0 <- tibble::tibble(
+    time = as.integer(1),
+    individual = 1:N,
+    variant = rep_len(1:k, N)
+  )
+
+  pop_devel <- list()
+  pop_devel[[1]] <- pop0
+
+  last_variant <- max(pop_devel[[1]]$variant)
+  for (p1 in timesteps) {
+    pop_new <- pop_devel[[p1 - 1]]
+    pop_new$time <- p1
+    pop_new$variant <- sample(pop_new$variant, length(pop_new$variant), replace = T)
+
+    # innovation
+    innovate_here <- sample(c(TRUE, FALSE), length(pop_new$variant), prob = c(mu_sim, 1 - mu_sim), replace = T)
+    new_variants <- seq(last_variant + 1, last_variant + sum(innovate_here))
+    last_variant <- last_variant + sum(innovate_here)
+    pop_new$variant[innovate_here] <- new_variants
+
+    pop_devel[[p1]] <- pop_new
+  }
+
+  pop_devel_df <- do.call(rbind, pop_devel)
+
+  pop_devel_sum <- pop_devel_df %>%
+    dplyr::group_by(
+      time, variant
+    ) %>%
+    dplyr::summarise(
+      individuals_with_variant = n()
+    )
+
+  pop_devel_sum %>%
+    ggplot() +
+    geom_area(aes(time, individuals_with_variant)) +
+    facet_grid(variant ~ .)
+})
+```
+
+# General form for small μ
+
+$$\hat{F} \simeq \frac{1}{2 N_e μ + 1}$$
+
+- $θ$: $2*N_e*μ$ 
+
+The homogeneity of neutral variants within a population is inversely proportional to twice the effective population size times the innovation rate.
+
+```{r homogeneity_general, echo=FALSE}
+theta <- function(Ne, mu) {
+  (2 * Ne * mu)
+}
+
+Fhat <- function(theta) {
+  1 / (theta + 1)
+}
+
+inputPanel(
+  sliderInput("Ne_3", label = "Ne",
+               min = 10, max = 100, value = 10, step = 10),
+  sliderInput("mu_3", label = "μ",
+               min = 0, max = 1, value = 0.01, step = 0.01)
+)
+
+renderPlot({
+  theta = 0:100 * theta(input$Ne_3, input$mu_3)
+  this_Fhat <- sapply(theta, function(x) {Fhat(x)})
+  
+  data.frame(
+    t = theta,
+    Fhat <- this_Fhat
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 1), color = "red") +
+    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_line(aes(theta, Fhat))
+})
+```
+
+# Homogeneity as a function of the relative frequency of variants in it
+
+$$\hat{F} = \sum_{i=1}^{k} p^2_i$$
+
+- $p_i$: relative frequency of the i'th variant in the population 
+
+```{r homogeneity_relative_frequency, echo=FALSE}
+Fhat_2 <- function(amount_of_variants) {
+  p <- runif(amount_of_variants)
+  p <- p / sum(p)
+  sum(p^2)
+}
+
+renderPlot({
+  tibble::tibble(
+    amount_of_variants = 0:100,
+    Fhat_min = sapply(amount_of_variants, function(x) {
+      min(replicate(500, Fhat_2(x)))
+    }),
+    Fhat_max = sapply(amount_of_variants, function(x) {
+      max(replicate(500, Fhat_2(x)))
+    }),
+    Fhat_mean = (Fhat_min + Fhat_max) / 2
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 1), color = "red") +
+    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_ribbon(aes(x = amount_of_variants, ymin = Fhat_min, ymax = Fhat_max)) +
+    geom_line(aes(x = amount_of_variants, y = Fhat_mean), color = "blue")
+})
+```
+
+# Diversity
+
+Estimating diversity within a population in these terms means that the population contains the same amount of diversity as would be found in an imaginary population with the effective number of variants at equal frequency.
+
+$$n_e = 2 N_e μ + 1$$
+
+- $n_e$ = Effective number of variants
+
+```{r diversity, echo=FALSE}
+ne <- function(theta) {
+  theta + 1
+}
+
+inputPanel(
+  sliderInput("Ne_4", label = "Ne",
+               min = 10, max = 100, value = 10, step = 10),
+  sliderInput("mu_4", label = "μ",
+               min = 0, max = 1, value = 0.01, step = 0.01)
+)
+
+renderPlot({
+  tibble::tibble(
+    theta = 0:100 * theta(input$Ne_4, input$mu_4),
+    ne = sapply(theta, function(x) {ne(x)})
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_line(aes(theta, ne))
+})
+```
+
+Furthermore, it is clear that θ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population.
+
+$$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
+
+- $t_F$: Estimated θ by the sum of squares of variant frequencies
+
+```{r theta_F, echo=FALSE}
+theta_F <- function(amount_of_variants) {
+  p <- runif(amount_of_variants)
+  p <- p / sum(p)
+  (1 / sum(p^2)) - 1
+}
+
+renderPlot({
+  tibble::tibble(
+    amount_of_variants = 0:100,
+    theta_F_min = sapply(amount_of_variants, function(x) {
+      min(replicate(500, theta_F(x)))
+    }),
+    theta_F_max = sapply(amount_of_variants, function(x) {
+      max(replicate(500, theta_F(x)))
+    }),
+    theta_F_mean = (theta_F_min + theta_F_max) / 2
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_ribbon(aes(x = amount_of_variants, ymin = theta_F_min, ymax = theta_F_max)) +
+    geom_line(aes(x = amount_of_variants, y = theta_F_mean), color = "blue")
+})
+```
+
+# Ewens
+
+$$E(k) = \sum_{i=0}^{n-1} \frac{θ}{θ + i}$$
+
+- $E(k)$: Expected number of different variants
+- $n$: Sample size
+
+```{r ewens, echo=FALSE}
+Ek <- function(n, theta) {
+  ressum <- 0
+  for (i in 0:(n-1)) {
+    ressum = ressum + (theta / (theta + i))
+  }
+  return(ressum)
+}
+
+inputPanel(
+  sliderInput("Ne_5", label = "Ne",
+               min = 10, max = 100, value = 10, step = 10),
+  sliderInput("mu_ewens", label = "μ",
+               min = 0, max = 1, value = 0.01, step = 0.01),
+  sliderInput("n_ewens", label = "n",
+               min = 0, max = 100, value = 10, step = 1)
+)
+
+renderPlot({
+  Ne <- input$Ne_5
+  mu <- input$mu_ewens
+  n <- input$n_ewens
+  
+  tibble::tibble(
+    theta = 0:100 * theta(Ne, mu),
+    n = rep(n, 101),
+    Ek = purrr::map2_dbl(n, theta, function(a, b) {Ek(a, b)})
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_line(aes(theta, Ek))
+})
+```
