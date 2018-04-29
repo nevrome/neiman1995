@@ -214,6 +214,8 @@ renderPlot({
 })
 ```
 
+$$\hat{F} = \frac{(1 - μ)^2}{N_e} - (N_e - 1)(1 - μ)^2$$
+
 $$\hat{F} \simeq \frac{1}{2 N_e μ + 1}$$
 
 - $θ$: $2*N_e*μ$ 
@@ -347,7 +349,9 @@ renderPlot({
 
 #### Diversity and Sample Size *p.15-16*
 
-$$E(k) = \sum_{i=0}^{n-1} \frac{θ}{θ + i}$$
+$$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
+
+$$E(k) = \sum_{i = 0}^{n - 1} \frac{θ}{θ + i}$$
 
 - $E(k)$: Expected number of different variants
 - $n$: Sample size
@@ -390,8 +394,14 @@ renderPlot({
 
 #### Dynamics of Stylistic Distance between Two Groups *p.21-24*
 
+$$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
+
 #### Stylistic Distances for Multiple Groups *p.24-25*
+
+$$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
 
 ### Woodland Interassemblage Distance
 
 #### Diversity and Distance for Individual Assemblages *p.26-27*
+
+$$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
