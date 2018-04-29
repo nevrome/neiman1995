@@ -129,8 +129,8 @@ renderPlot({
     Ft <- this_Ft
   ) %>%
     ggplot() +
-    geom_hline(aes(yintercept = 1), color = "red") +
-    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_hline(aes(yintercept = 1), color = "darkblue") +
+    geom_hline(aes(yintercept = 0), color = "darkblue") +
     geom_line(aes(t, Ft))
 })
 ```
@@ -252,8 +252,8 @@ renderPlot({
     Ft <- this_Ft_2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "red") +
-    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_hline(aes(yintercept = 1), color = "darkblue") +
+    geom_hline(aes(yintercept = 0), color = "darkblue") +
     geom_line(aes(t, Ft))
 })
 ```
@@ -291,8 +291,8 @@ renderPlot({
     Fhat <- this_Fhat
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "red") +
-    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_hline(aes(yintercept = 1), color = "darkblue") +
+    geom_hline(aes(yintercept = 0), color = "darkblue") +
     geom_line(aes(theta, Fhat))
 })
 ```
@@ -320,8 +320,8 @@ renderPlot({
     Fhat_mean = (Fhat_min + Fhat_max) / 2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "red") +
-    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_hline(aes(yintercept = 1), color = "darkblue") +
+    geom_hline(aes(yintercept = 0), color = "darkblue") +
     geom_ribbon(aes(x = amount_of_variants, ymin = Fhat_min, ymax = Fhat_max)) +
     geom_line(aes(x = amount_of_variants, y = Fhat_mean), color = "blue")
 })
@@ -353,7 +353,7 @@ renderPlot({
     ne = sapply(theta, function(x) {ne(x)})
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_hline(aes(yintercept = 0), color = "darkblue") +
     geom_line(aes(theta, ne))
 })
 ```
@@ -383,7 +383,7 @@ renderPlot({
     theta_F_mean = (theta_F_min + theta_F_max) / 2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_hline(aes(yintercept = 0), color = "darkblue") +
     geom_ribbon(aes(x = amount_of_variants, ymin = theta_F_min, ymax = theta_F_max)) +
     geom_line(aes(x = amount_of_variants, y = theta_F_mean), color = "blue")
 })
@@ -429,7 +429,7 @@ renderPlot({
     Ek = purrr::map2_dbl(n, theta, function(a, b) {Ek(a, b)})
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "red") +
+    geom_hline(aes(yintercept = 0), color = "darkblue") +
     geom_line(aes(theta, Ek))
 })
 ```
