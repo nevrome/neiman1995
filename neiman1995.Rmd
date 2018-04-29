@@ -88,7 +88,8 @@ drift_simulation_plot <- eventReactive(
       theme_bw() +
       xlab("time / number of iterations") +
       ylab("variants and their occurence in the population [%]")
-  }
+  },
+  ignoreNULL = FALSE
 )
 
 renderPlot({
@@ -217,7 +218,8 @@ drift_simulation_plot_2 <- eventReactive(
       theme_bw() +
       xlab("time / number of iterations") +
       ylab("variants and their occurence in the population [%]")
-  }
+  },
+  ignoreNULL = FALSE
 )
 
 renderPlot({
