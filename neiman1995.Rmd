@@ -12,7 +12,7 @@ runtime: shiny
 
 This document visualizes the general model functions in Fraser D. Neimans article *Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages* from 1995. 
 
-```{r setup, include=FALSE}
+```{r include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -32,7 +32,7 @@ source("./R/squared_euclidian_distance.R", local = TRUE)
 - $N$: population size
 - $t$: time / number of iterations
 
-```{r drift_simulation, echo=FALSE}
+```{r echo=FALSE}
 inputPanel(
   sliderInput("k", label = "k",
                min = 5, max = 15, value = 10, step = 1),
@@ -113,7 +113,7 @@ $$F_t = \frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}$$
 - $t$: time
 - $N_e$: size of the effective population
 
-```{r drift, echo=FALSE}
+```{r echo=FALSE}
 Ft <- function(F0, Ne, t) {
   if(t == 0) {return(F0)}
   1/Ne + (1 - 1/Ne) * Ft(F0, Ne, t - 1)
@@ -146,7 +146,7 @@ renderPlot({
 
 - $μ$: innovation rate
 
-```{r drift_simulation_innovation, echo=FALSE}
+```{r echo=FALSE}
 inputPanel(
   sliderInput("k_2", label = "k for t == 0",
                min = 5, max = 15, value = 10, step = 1),
@@ -236,7 +236,7 @@ renderPlot({
 
 $$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
 
-```{r innovation, echo=FALSE}
+```{r echo=FALSE}
 Ft_2 <- function(F0, Ne, t, mu) {
   if(t == 0) {return(F0)}
   (1/Ne + (1 - 1/Ne) * Ft_2(F0, Ne, t - 1, mu)) * (1 - mu)^2
@@ -275,7 +275,7 @@ $$\hat{F} \simeq \frac{1}{2 N_e μ + 1}$$
 
 The homogeneity of neutral variants within a population is inversely proportional to twice the effective population size times the innovation rate.
 
-```{r homogeneity_general, echo=FALSE}
+```{r echo=FALSE}
 theta <- function(Ne, mu) {
   (2 * Ne * mu)
 }
@@ -316,7 +316,7 @@ $$\hat{F} = \sum_{i=1}^{k} p^2_i$$
 
 - $p_i$: relative frequency of the i'th variant in the population 
 
-```{r homogeneity_relative_frequency, echo=FALSE}
+```{r echo=FALSE}
 Fhat_2 <- function(amount_of_variants) {
   p <- runif(amount_of_variants)
   p <- p / sum(p)
@@ -354,7 +354,7 @@ $$n_e = 2 N_e μ + 1$$
 
 - $n_e$ = Effective number of variants
 
-```{r diversity, echo=FALSE}
+```{r echo=FALSE}
 ne <- function(theta) {
   theta + 1
 }
@@ -389,7 +389,7 @@ $$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
 
 - $t_F$: Estimated θ by the sum of squares of variant frequencies
 
-```{r theta_F, echo=FALSE}
+```{r echo=FALSE}
 theta_F <- function(amount_of_variants) {
   p <- runif(amount_of_variants)
   p <- p / sum(p)
@@ -426,7 +426,7 @@ $$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
 
 - $H$: [Shannon's diversity index](http://www.tiem.utk.edu/~gross/bioed/bealsmodules/shannonDI.html)
 
-```{r shannon_weaver, echo=FALSE}
+```{r echo=FALSE}
 H <- function(amount_of_variants) {
   p <- runif(amount_of_variants)
   p <- p / sum(p)
@@ -460,7 +460,7 @@ $$E(k) = \sum_{i = 0}^{n - 1} \frac{θ}{θ + i}$$
 - $E(k)$: Expected number of different variants
 - $n$: Sample size
 
-```{r ewens, echo=FALSE}
+```{r echo=FALSE}
 Ek <- function(n, theta) {
   ressum <- 0
   for (i in 0:(n-1)) {
@@ -509,7 +509,7 @@ $$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
 - $d_{ij}^2$: Squared Euclidian distance between to groups
 - $n$: amount_of_variants
 
-```{r sed, echo=FALSE}
+```{r echo=FALSE}
 renderPlot({
   tibble::tibble(
     amount_of_variants = 0:100,
@@ -537,7 +537,7 @@ Simulation
 
 $m_i$: intergroup transmission rate
 
-```{r group_drift_simulation, echo=FALSE}
+```{r echo=FALSE}
 inputPanel(
   sliderInput("k_group", label = "k",
                min = 5, max = 15, value = 10, step = 1),
@@ -574,7 +574,7 @@ renderPlot({
 })
 ```
 
-```{r sed_sim, echo=FALSE}
+```{r echo=FALSE}
 renderPlot({
   calculate_sed_for_group_drift_simulation_result(
     group_drift_simulation_data()
@@ -590,7 +590,7 @@ renderPlot({
 
 Many simulation runs
 
-```{r sed_sim_iter, echo=FALSE}
+```{r echo=FALSE}
 inputPanel(
   sliderInput("k_group_2", label = "k",
                min = 5, max = 15, value = 10, step = 1),
