@@ -615,7 +615,7 @@ group_drift_simulation_data_2 <- eventReactive(
           input$k_group, 
           input$N_group, 
           input$t_final_group, 
-          input$mi
+          input$mi_2
         ),
         sim_run = i
       ) 
