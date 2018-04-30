@@ -506,7 +506,7 @@ $$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
 - $d_{ij}^2$: Squared Euclidian distance between to groups
 - $n$: amount_of_variants
 
-```{r ewens, echo=FALSE}
+```{r sed, echo=FALSE}
 sed <- function(amount_of_variants) {
   pi <- runif(amount_of_variants)
   pj <- runif(amount_of_variants)
@@ -535,6 +535,117 @@ renderPlot({
     ) +
     geom_line(aes(x = amount_of_variants, y = sed_mean), color = "black", size = 1) +
     theme_bw()
+})
+```
+
+Simulation
+
+$m_i$: intergroup transmission rate
+
+```{r group_drift_simulation, echo=FALSE}
+inputPanel(
+  sliderInput("k_group", label = "k",
+               min = 5, max = 15, value = 10, step = 1),
+  sliderInput("N_group", label = "N",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_final_group", label = "t",
+               min = 50, max = 200, value = 100, step = 50),
+  sliderInput("mi", label = "mi",
+               min = 0, max = 1, value = 0.1, step = 0.01),
+  actionButton("run_button_group_drift_simulation", "Run simulation")
+)
+
+group_drift_simulation_plot <- eventReactive(
+  input$run_button_group_drift_simulation, {
+    k <- input$k_group
+    N <- input$N_group
+    t_final <- input$t_final_group
+    mi <- input$mi
+    
+    population <- 1:N
+    variants <- 1:k
+    timesteps <- 2:t_final
+    
+    popA0 <- tibble::tibble(
+      time = as.integer(1),
+      individual = 1:N,
+      variant = rep_len(1:k, N),
+      group = "A"
+    )
+    popB0 <- tibble::tibble(
+      time = as.integer(1),
+      individual = 1:N,
+      variant = rep_len(1:k, N),
+      group = "B"
+    )
+    
+    popA_devel <- list()
+    popB_devel <- list()
+    popA_devel[[1]] <- popA0
+    popB_devel[[1]] <- popB0
+    
+    for (p1 in timesteps) {
+      popA_new <- popA_devel[[p1 - 1]]
+      popB_new <- popB_devel[[p1 - 1]]
+      
+      popA_new$time <- p1
+      popB_new$time <- p1
+
+      exchange_here <- sample(
+        c(TRUE, FALSE), 
+        length(popA_new$variant), 
+        prob = c(mi, 1 - mi), 
+        replace = T
+      )
+            
+      popA_old_variant <- popA_new$variant
+      # in group A
+      popA_new$variant <- sample(popA_new$variant, length(popA_new$variant), replace = T)
+      # ex group A
+      popA_new$variant[exchange_here] <- sample(popB_new$variant, sum(exchange_here))
+      # in group B
+      popB_new$variant <- sample(popB_new$variant, length(popB_new$variant), replace = T)
+      # ex group B
+      popB_new$variant[exchange_here] <- sample(popA_old_variant, sum(exchange_here))
+      
+      popA_devel[[p1]] <- popA_new
+      popB_devel[[p1]] <- popB_new
+    }
+    
+    pop_devel <- append(popA_devel, popB_devel)
+    
+    pop_devel_df <- do.call(rbind, pop_devel)
+    
+    pop_devel_sum <- pop_devel_df %>%
+      dplyr::group_by(
+        time, variant, group
+      ) %>%
+      dplyr::summarise(
+        individuals_with_variant = n()
+      ) %>%
+      dplyr::ungroup() %>%
+      # that's just to fil gaps in the area plot
+      tidyr::complete(
+        time, 
+        variant, 
+        group,
+        fill = list(individuals_with_variant = as.integer(0))
+      )
+    
+    pop_devel_sum %>%
+      ggplot() +
+      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+      theme_bw() +
+      xlab("time / number of iterations") +
+      ylab("variants and their occurence in the population [%]") +
+      facet_grid(group ~ .)
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  group_drift_simulation_plot()
 })
 ```
 
