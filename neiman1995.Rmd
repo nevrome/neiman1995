@@ -625,7 +625,8 @@ group_drift_simulation_data_2 <- eventReactive(
       ggplot() +
       geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
       geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
-      geom_line(aes(x = t, y = sed, color = sim_run, group = sim_run), size = 1, alpha = 0.3) +
+      geom_line(aes(x = t, y = sed, group = sim_run), color = "black", size = 1, alpha = 0.3) +
+      geom_point(aes(x = t, y = sed), color = "black", size = 1) +
       theme_bw()
   },
   ignoreNULL = TRUE
