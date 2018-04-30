@@ -640,8 +640,12 @@ renderPlot({
 
 $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
 
+$$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
+
 ### Woodland Interassemblage Distance
 
 #### Diversity and Distance for Individual Assemblages *p.26-27* **(12)**
 
-$$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
+$$\bar{d}_{i}^{2} = \sum_{j = 1}^{n} d_{ij}^{2} / (n - 1), i \neq j$$
+
+
