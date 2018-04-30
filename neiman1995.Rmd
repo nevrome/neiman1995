@@ -587,6 +587,54 @@ renderPlot({
 })
 ```
 
+Many simulation runs
+
+```{r sed_sim_iter, echo=FALSE}
+inputPanel(
+  sliderInput("k_group_2", label = "k",
+               min = 5, max = 15, value = 10, step = 1),
+  sliderInput("N_group_2", label = "N",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_final_group_2", label = "t",
+               min = 50, max = 200, value = 100, step = 50),
+  sliderInput("mi_2", label = "mi",
+               min = 0, max = 1, value = 0.1, step = 0.01),
+  sliderInput("sim_runs", label = "Number of simulation runs",
+               min = 1, max = 100, value = 20, step = 1),
+  actionButton("run_button_group_drift_simulation_iter", "Run simulation")
+)
+
+group_drift_simulation_data_2 <- eventReactive(
+  input$run_button_group_drift_simulation_iter, {
+    
+    res_list <- list()
+    for (i in 1:input$sim_runs) {
+      res_list[[i]] <- calculate_sed_for_group_drift_simulation_result(
+        group_drift_simulation(
+          input$k_group, 
+          input$N_group, 
+          input$t_final_group, 
+          input$mi
+        ),
+        sim_run = i
+      ) 
+    }
+    
+    do.call(rbind, res_list) %>%
+      ggplot() +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
+      geom_line(aes(x = t, y = sed, color = sim_run, group = sim_run), size = 1, alpha = 0.3) +
+      theme_bw()
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  group_drift_simulation_data_2()
+})
+```
+
 #### Stylistic Distances for Multiple Groups *p.24-25* **(11)**
 
 $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
