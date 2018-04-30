@@ -582,6 +582,7 @@ renderPlot({
     ggplot() +
     geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
     geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
+    geom_line(aes(x = t, y = sed), color = "black", size = 1, alpha = 0.3) +
     geom_point(aes(x = t, y = sed), color = "black", size = 1) +
     theme_bw()
 })
