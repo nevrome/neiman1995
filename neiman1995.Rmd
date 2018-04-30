@@ -1,10 +1,12 @@
 ---
 title: "Visualizing Neimans 'Stylistic variation in evolutionary perspective'"
 author: "Clemens Schmid"
-date: "April 26, 2018"
+date: "April 2018"
 output: 
   html_document:
     css: styles.css
+    toc: true
+    toc_depth: 4
 runtime: shiny
 ---
 
@@ -97,7 +99,7 @@ renderPlot({
 })
 ```
 
-#### Homogeneity Under Drift *p.10-12*
+#### Homogeneity Under Drift *p.10-12* **(1)**
 
 The amount of increase in homogeneity in each time period is inversely proportional to the effective population size.
 
@@ -227,7 +229,7 @@ renderPlot({
 })
 ```
 
-#### Homogeneity Under Drift and Innovation *p.14*
+#### Homogeneity Under Drift and Innovation *p.14* **(2)** **(3)** **(4)** **(5)**
 
 $$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
 
@@ -341,7 +343,7 @@ renderPlot({
 })
 ```
 
-#### Diversity *p.14-15*
+#### Diversity *p.14-15* **(6)** **(7)**
 
 Estimating diversity within a population in these terms means that the population contains the same amount of diversity as would be found in an imaginary population with the effective number of variants at equal frequency.
 
@@ -415,7 +417,7 @@ renderPlot({
 
 ### Archaeological Application
 
-#### Diversity and Sample Size *p.15-16*
+#### Diversity and Sample Size *p.15-16* **(8)** **(9)**
 
 $$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
 
@@ -497,16 +499,16 @@ renderPlot({
 
 ### Drift, Intergroup Transmission, and Interassemblage Distance 
 
-#### Dynamics of Stylistic Distance between Two Groups *p.21-24*
+#### Dynamics of Stylistic Distance between Two Groups *p.21-24* **(10)**
 
 $$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
 
-#### Stylistic Distances for Multiple Groups *p.24-25*
+#### Stylistic Distances for Multiple Groups *p.24-25* **(11)**
 
 $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
 
 ### Woodland Interassemblage Distance
 
-#### Diversity and Distance for Individual Assemblages *p.26-27*
+#### Diversity and Distance for Individual Assemblages *p.26-27* **(12)**
 
 $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
