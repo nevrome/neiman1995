@@ -640,7 +640,25 @@ renderPlot({
 
 $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
 
+- $\mathbf{M}$: Matrix of intergroup transmission rates
+- $\mathbf{V}^{(t)}$: Matrix of variances and covariances
+- $r$: Index of the successive time periods
+- $\mathbf{U}$ Matrix of reciprocals of the effective population sizes ($1 / N_e$). These are on the diagonal, the rest is 0.
+
+```{r echo = FALSE}
+amount_groups <- 5
+group_matrix <- matrix(data = rep(0, amount_groups^2), nrow = amount_groups, ncol = amount_groups)
+
+Ne <- 20
+U <- group_matrix
+diag(U) <- Ne
+```
+
 $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
+
+- $v_{ii}^{(t)}$: Diagonal element of $\mathbf{V}^{(t)}$ -- a variance. The square of of the departure of the variant frequency in the $i$'th deme at time $t$ from its starting frequency when the demes were identical, standardized by the variance of that starting frequency.
+- $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes i and j, again standardized by the variance of the starting frequency. 
+
 
 ### Woodland Interassemblage Distance
 
