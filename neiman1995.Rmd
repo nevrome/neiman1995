@@ -503,6 +503,41 @@ renderPlot({
 
 $$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
 
+- $d_{ij}^2$: Squared Euclidian distance between to groups
+- $n$: amount_of_variants
+
+```{r ewens, echo=FALSE}
+sed <- function(amount_of_variants) {
+  pi <- runif(amount_of_variants)
+  pj <- runif(amount_of_variants)
+  pi <- pi / sum(pi)
+  pj <- pj / sum(pj)
+  sum((pi - pj)^2)
+}
+
+renderPlot({
+  tibble::tibble(
+    amount_of_variants = 0:100,
+    sed_min = sapply(amount_of_variants, function(x) {
+      min(replicate(500, sed(x)))
+    }),
+    sed_max = sapply(amount_of_variants, function(x) {
+      max(replicate(500, sed(x)))
+    }),
+    sed_mean = (sed_min + sed_max) / 2
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_ribbon(
+      aes(x = amount_of_variants, ymin = sed_min, ymax = sed_max), 
+      fill = "deepskyblue", alpha = 0.5
+    ) +
+    geom_line(aes(x = amount_of_variants, y = sed_mean), color = "black", size = 1) +
+    theme_bw()
+})
+```
+
 #### Stylistic Distances for Multiple Groups *p.24-25* **(11)**
 
 $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
