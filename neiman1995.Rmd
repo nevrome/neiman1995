@@ -555,7 +555,7 @@ inputPanel(
   actionButton("run_button_group_drift_simulation", "Run simulation")
 )
 
-group_drift_simulation_plot <- eventReactive(
+group_drift_simulation_data <- eventReactive(
   input$run_button_group_drift_simulation, {
     k <- input$k_group
     N <- input$N_group
@@ -632,20 +632,55 @@ group_drift_simulation_plot <- eventReactive(
         fill = list(individuals_with_variant = as.integer(0))
       )
     
-    pop_devel_sum %>%
-      ggplot() +
-      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
-      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
-      theme_bw() +
-      xlab("time / number of iterations") +
-      ylab("variants and their occurence in the population [%]") +
-      facet_grid(group ~ .)
+    pop_devel_sum
   },
   ignoreNULL = FALSE
 )
 
 renderPlot({
-  group_drift_simulation_plot()
+  group_drift_simulation_data() %>%
+    ggplot() +
+    geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+    geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+    theme_bw() +
+    xlab("time / number of iterations") +
+    ylab("variants and their occurence in the population [%]") +
+    facet_grid(group ~ .)
+})
+```
+
+```{r sed_sim, echo=FALSE}
+sed_2 <- function(pi, pj) {
+  pi <- pi / sum(pi)
+  pj <- pj / sum(pj)
+  sum((pi - pj)^2)
+}
+
+renderPlot({
+  
+  pop_devel_sum <- group_drift_simulation_data()
+  
+  groups <- pop_devel_sum %>%
+    base::split(., .$group)
+  
+  A <- groups$A %>%
+    base::split(., .$time)
+  B <- groups$B %>%
+    base::split(., .$time)
+  
+  A <- lapply(A, function(x) {x$individuals_with_variant})
+  B <- lapply(B, function(x) {x$individuals_with_variant})
+  
+  sed_res <- purrr::map2_dbl(A, B, function(a, b) {sed_2(a, b)})
+  
+  tibble::tibble(
+    t = unique(pop_devel_sum$time),
+    sed = sed_res
+  ) %>%
+    ggplot() +
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_point(aes(x = t, y = sed), color = "black", size = 1) +
+    theme_bw()
 })
 ```
 
