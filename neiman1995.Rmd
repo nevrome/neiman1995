@@ -21,6 +21,7 @@ library(ggplot2)
 library(magrittr)
 
 source("./R/group_drift_simulation.R", local = TRUE)
+source("./R/squared_euclidian_distance.R", local = TRUE)
 ```
 
 ### Drift, Innovation and Diversity
@@ -509,22 +510,14 @@ $$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
 - $n$: amount_of_variants
 
 ```{r sed, echo=FALSE}
-sed <- function(amount_of_variants) {
-  pi <- runif(amount_of_variants)
-  pj <- runif(amount_of_variants)
-  pi <- pi / sum(pi)
-  pj <- pj / sum(pj)
-  sum((pi - pj)^2)
-}
-
 renderPlot({
   tibble::tibble(
     amount_of_variants = 0:100,
     sed_min = sapply(amount_of_variants, function(x) {
-      min(replicate(500, sed(x)))
+      min(replicate(500, sed(runif(x), runif(x))))
     }),
     sed_max = sapply(amount_of_variants, function(x) {
-      max(replicate(500, sed(x)))
+      max(replicate(500, sed(runif(x), runif(x))))
     }),
     sed_mean = (sed_min + sed_max) / 2
   ) %>%
@@ -582,12 +575,6 @@ renderPlot({
 ```
 
 ```{r sed_sim, echo=FALSE}
-sed_2 <- function(pi, pj) {
-  pi <- pi / sum(pi)
-  pj <- pj / sum(pj)
-  sum((pi - pj)^2)
-}
-
 renderPlot({
   
   pop_devel_sum <- group_drift_simulation_data()
@@ -603,7 +590,7 @@ renderPlot({
   A <- lapply(A, function(x) {x$individuals_with_variant})
   B <- lapply(B, function(x) {x$individuals_with_variant})
   
-  sed_res <- purrr::map2_dbl(A, B, function(a, b) {sed_2(a, b)})
+  sed_res <- purrr::map2_dbl(A, B, function(a, b) {sed(a, b)})
   
   tibble::tibble(
     t = unique(pop_devel_sum$time),
