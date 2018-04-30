@@ -576,25 +576,8 @@ renderPlot({
 
 ```{r sed_sim, echo=FALSE}
 renderPlot({
-  
-  pop_devel_sum <- group_drift_simulation_data()
-  
-  groups <- pop_devel_sum %>%
-    base::split(., .$group)
-  
-  A <- groups$A %>%
-    base::split(., .$time)
-  B <- groups$B %>%
-    base::split(., .$time)
-  
-  A <- lapply(A, function(x) {x$individuals_with_variant})
-  B <- lapply(B, function(x) {x$individuals_with_variant})
-  
-  sed_res <- purrr::map2_dbl(A, B, function(a, b) {sed(a, b)})
-  
-  tibble::tibble(
-    t = unique(pop_devel_sum$time),
-    sed = sed_res
+  calculate_sed_for_group_drift_simulation_result(
+    group_drift_simulation_data()
   ) %>%
     ggplot() +
     geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
