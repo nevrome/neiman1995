@@ -419,6 +419,37 @@ renderPlot({
 
 $$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
 
+- $H$: [Shannon's diversity index](http://www.tiem.utk.edu/~gross/bioed/bealsmodules/shannonDI.html)
+
+```{r shannon_weaver, echo=FALSE}
+H <- function(amount_of_variants) {
+  p <- runif(amount_of_variants)
+  p <- p / sum(p)
+  -sum(p * log(p))
+}
+
+renderPlot({
+  tibble::tibble(
+    amount_of_variants = 0:100,
+    H_min = sapply(amount_of_variants, function(x) {
+      min(replicate(500, H(x)))
+    }),
+    H_max = sapply(amount_of_variants, function(x) {
+      max(replicate(500, H(x)))
+    }),
+    H_mean = (H_min + H_max) / 2
+  ) %>%
+    ggplot() +    
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_ribbon(
+      aes(x = amount_of_variants, ymin = H_min, ymax = H_max), 
+      fill = "deepskyblue", alpha = 0.5
+    ) +
+    geom_line(aes(x = amount_of_variants, y = H_mean), color = "black", size = 1) +
+    theme_bw()
+})
+```
+
 $$E(k) = \sum_{i = 0}^{n - 1} \frac{θ}{θ + i}$$
 
 - $E(k)$: Expected number of different variants
