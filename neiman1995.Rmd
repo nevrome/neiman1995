@@ -224,7 +224,7 @@ drift_simulation_plot_2 <- eventReactive(
       xlab("time / number of iterations") +
       ylab("variants and their occurence in the population [%]")
   },
-  ignoreNULL = TRUE
+  ignoreNULL = FALSE
 )
 
 renderPlot({
@@ -559,7 +559,7 @@ group_drift_simulation_data <- eventReactive(
       input$mi
     )
   },
-  ignoreNULL = TRUE
+  ignoreNULL = FALSE
 )
 
 renderPlot({
@@ -629,7 +629,7 @@ group_drift_simulation_data_2 <- eventReactive(
       geom_point(aes(x = t, y = sed), color = "black", size = 1) +
       theme_bw()
   },
-  ignoreNULL = TRUE
+  ignoreNULL = FALSE
 )
 
 renderPlot({
