@@ -701,22 +701,22 @@ matrix_calculation_data <- eventReactive(
 renderPlot({
   Mplot <- ggplot(matrix_calculation_data()$longM, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5) +
+    geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
     scale_y_reverse(sec.axis = dup_axis()) +
     scale_x_continuous(sec.axis = dup_axis())
   Mtplot <- ggplot(matrix_calculation_data()$longMt, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5) +
+    geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
     scale_y_reverse(sec.axis = dup_axis()) +
     scale_x_continuous(sec.axis = dup_axis())
   Uplot <- ggplot(matrix_calculation_data()$longU, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5) +
+    geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
     scale_y_reverse(sec.axis = dup_axis()) +
     scale_x_continuous(sec.axis = dup_axis())
   Vplot <- ggplot(matrix_calculation_data()$longV, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5) +
+    geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
     scale_y_reverse(sec.axis = dup_axis()) +
     scale_x_continuous(sec.axis = dup_axis())
   
