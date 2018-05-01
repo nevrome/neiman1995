@@ -672,10 +672,14 @@ renderPlot({
   V <- Reduce(`+`, matrix_time_list) 
   
   longM <- reshape2::melt(M(k))
+  longMt <- reshape2::melt(t(M(k)))
   longU <- reshape2::melt(U)
   longV <- reshape2::melt(V)
   
   Mplot <- ggplot(longM, aes(x = Var2, y = Var1)) + 
+    geom_raster(aes(fill=value)) +
+    geom_text(aes(x = Var2, y = Var1, label = value))
+  Mtplot <- ggplot(longMt, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
     geom_text(aes(x = Var2, y = Var1, label = value))
   Uplot <- ggplot(longU, aes(x = Var2, y = Var1)) + 
@@ -685,7 +689,7 @@ renderPlot({
     geom_raster(aes(fill=value)) +
     geom_text(aes(x = Var2, y = Var1, label = value))
   
-  cowplot::plot_grid(Mplot, Uplot, Vplot, labels = c("M", "U", "V"), nrow = 2, ncol = 2)
+  cowplot::plot_grid(Mplot, Mtplot, Uplot, Vplot, labels = c("M", "M'", "U", "V"), nrow = 2, ncol = 2)
 },
 height = 800
 )
