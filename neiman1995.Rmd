@@ -597,7 +597,7 @@ inputPanel(
   sliderInput("N_group_2", label = "N",
                min = 10, max = 100, value = 20, step = 10),
   sliderInput("t_final_group_2", label = "t",
-               min = 50, max = 200, value = 100, step = 50),
+               min = 20, max = 200, value = 20, step = 20),
   sliderInput("mi_2", label = "mi",
                min = 0, max = 1, value = 0.1, step = 0.01),
   sliderInput("sim_runs", label = "Number of simulation runs",
@@ -612,9 +612,9 @@ group_drift_simulation_data_2 <- eventReactive(
     for (i in 1:input$sim_runs) {
       res_list[[i]] <- calculate_sed_for_group_drift_simulation_result(
         group_drift_simulation(
-          input$k_group, 
-          input$N_group, 
-          input$t_final_group, 
+          input$k_group_2, 
+          input$N_group_2, 
+          input$t_final_group_2, 
           input$mi_2
         ),
         sim_run = i
@@ -652,7 +652,7 @@ group_matrix <- matrix(data = rep(0, amount_groups^2), nrow = amount_groups, nco
 
 Ne <- 20
 U <- group_matrix
-diag(U) <- Ne
+diag(U) <- 1/Ne
 ```
 
 $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
