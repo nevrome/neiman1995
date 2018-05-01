@@ -649,6 +649,7 @@ $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^
 
 ```{r echo = FALSE}
 renderPlot({
+  t <- 20
   amount_groups <- 5
   group_matrix <- matrix(data = rep(0, amount_groups^2), nrow = amount_groups, ncol = amount_groups)
   
@@ -656,12 +657,21 @@ renderPlot({
   U <- group_matrix
   diag(U) <- 1/Ne
   
-  M <- group_matrix
-  M[] <- 0.2
+  M <- function(k) {
+    M <- group_matrix
+    M[] <- 0.2
+    M
+  }
   
-  V = M * U * t(M) 
+  matrix_time_list <- list()
   
-  longM <- reshape2::melt(M)
+  for (k in 1:t) {
+    matrix_time_list[[k]] <- M(k) * U * t(M(k)) 
+  }
+  
+  V <- Reduce(`+`, matrix_time_list) 
+  
+  longM <- reshape2::melt(M(k))
   longU <- reshape2::melt(U)
   longV <- reshape2::melt(V)
   
