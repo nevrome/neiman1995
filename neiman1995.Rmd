@@ -688,11 +688,17 @@ matrix_calculation_data <- eventReactive(
     V <- Reduce(`+`, matrix_time_list) 
     
     # matrix of squared euclidian distance
-    mosed <- V
+    mosed <- group_matrix
     for (p1 in 1:nrow(V)) {
       for (p2 in 1:ncol(V)) {
         mosed[p1, p2] <- V[p1, p1] + V[p2, p2] - 2 * V[p1, p2]
       }
+    }
+    
+    # mean squared distance of a group 
+    msd <- group_matrix
+    for (p3 in 1:nrow(V)) {
+      diag(msd)[p3] <- sum(mosed[p3,] / (amount_groups - 1))  
     }
     
     list(
@@ -700,7 +706,8 @@ matrix_calculation_data <- eventReactive(
       longMt = reshape2::melt(t(M(k))),
       longU = reshape2::melt(U),
       longV = reshape2::melt(V),
-      longmosed = reshape2::melt(mosed)
+      longmosed = reshape2::melt(mosed),
+      longmsd = reshape2::melt(msd)
     )
   },
   ignoreNULL = FALSE
@@ -732,10 +739,15 @@ renderPlot({
     geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
     scale_y_reverse(sec.axis = dup_axis()) +
     scale_x_continuous(sec.axis = dup_axis())
+  msdplot <- ggplot(matrix_calculation_data()$longmsd, aes(x = Var2, y = Var1)) + 
+    geom_raster(aes(fill=value)) +
+    geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
+    scale_y_reverse(sec.axis = dup_axis()) +
+    scale_x_continuous(sec.axis = dup_axis())
   
   cowplot::plot_grid(
-    Mplot, Mtplot, Uplot, Vplot, mosedplot, 
-    labels = c("M", "M'", "U", "V", "SED"), 
+    Mplot, Mtplot, Uplot, Vplot, mosedplot, msdplot,
+    labels = c("M", "M'", "U", "V", "SED", "MSD"), 
     nrow = 3, ncol = 2
   )
 },
