@@ -649,8 +649,6 @@ $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^
 
 ```{r echo = FALSE}
 inputPanel(
-  sliderInput("amount_groups", label = "amount of groups",
-             min = 2, max = 10, value = 5, step = 1),
   sliderInput("Ne_matrix", label = "Ne",
              min = 10, max = 100, value = 20, step = 10),
   sliderInput("t_matrix", label = "t",
@@ -661,7 +659,7 @@ inputPanel(
 matrix_calculation_data <- eventReactive(
   input$run_button_matrix_calculation, {
     
-    amount_groups <- input$amount_groups
+    amount_groups <- 5
     Ne <- input$Ne_matrix
     t <- input$t_matrix
 
@@ -689,11 +687,20 @@ matrix_calculation_data <- eventReactive(
     
     V <- Reduce(`+`, matrix_time_list) 
     
+    # matrix of squared euclidian distance
+    mosed <- V
+    for (p1 in 1:nrow(V)) {
+      for (p2 in 1:ncol(V)) {
+        mosed[p1, p2] <- V[p1, p1] + V[p2, p2] - 2 * V[p1, p2]
+      }
+    }
+    
     list(
       longM = reshape2::melt(M(k)),
       longMt = reshape2::melt(t(M(k))),
       longU = reshape2::melt(U),
-      longV = reshape2::melt(V)
+      longV = reshape2::melt(V),
+      longmosed = reshape2::melt(mosed)
     )
   }
 )
@@ -719,10 +726,19 @@ renderPlot({
     geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
     scale_y_reverse(sec.axis = dup_axis()) +
     scale_x_continuous(sec.axis = dup_axis())
+  mosedplot <- ggplot(matrix_calculation_data()$longmosed, aes(x = Var2, y = Var1)) + 
+    geom_raster(aes(fill=value)) +
+    geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
+    scale_y_reverse(sec.axis = dup_axis()) +
+    scale_x_continuous(sec.axis = dup_axis())
   
-  cowplot::plot_grid(Mplot, Mtplot, Uplot, Vplot, labels = c("M", "M'", "U", "V"), nrow = 2, ncol = 2)
+  cowplot::plot_grid(
+    Mplot, Mtplot, Uplot, Vplot, mosedplot, 
+    labels = c("M", "M'", "U", "V", "SED"), 
+    nrow = 3, ncol = 2
+  )
 },
-height = 800
+height = 1200
 )
 ``` 
 
