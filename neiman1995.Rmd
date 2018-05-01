@@ -659,7 +659,12 @@ renderPlot({
   
   M <- function(k) {
     M <- group_matrix
-    M[] <- 0.2
+    #M[] <- 0.2
+    M[1,] <- c(0.3, 0.1, 0.1, 0.3, 0.1)
+    M[2,] <- c(0.1, 0.1, 0.3, 0.1, 0.3)
+    M[3,] <- c(0.3, 0.3, 0.1, 0.1, 0.1)
+    M[4,] <- c(0.1, 0.3, 0.2, 0.3, 0.3)
+    M[5,] <- c(0.3, 0.2, 0.3, 0.2, 0.1)
     M
   }
   
@@ -678,16 +683,16 @@ renderPlot({
   
   Mplot <- ggplot(longM, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value))
+    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5)
   Mtplot <- ggplot(longMt, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value))
+    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5)
   Uplot <- ggplot(longU, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value))
+    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5)
   Vplot <- ggplot(longV, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value))
+    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5)
   
   cowplot::plot_grid(Mplot, Mtplot, Uplot, Vplot, labels = c("M", "M'", "U", "V"), nrow = 2, ncol = 2)
 },
