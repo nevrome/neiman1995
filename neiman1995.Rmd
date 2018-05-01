@@ -702,7 +702,8 @@ matrix_calculation_data <- eventReactive(
       longV = reshape2::melt(V),
       longmosed = reshape2::melt(mosed)
     )
-  }
+  },
+  ignoreNULL = FALSE
 )
 
 renderPlot({
