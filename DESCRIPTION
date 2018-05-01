@@ -2,11 +2,13 @@ Package: placeholder
 Title: Does not matter.
 Version: 0.0.1
 Imports:
+  cowplot,
   dplyr,
   ggplot2,
   knitr,
   magrittr,
   purrr,
+  reshape2,
   rmarkdown,
   rsconnect,
   shiny,

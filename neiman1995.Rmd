@@ -645,15 +645,41 @@ $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^
 - $\mathbf{V}^{(t)}$: Matrix of variances and covariances
 - $r$: Index of the successive time periods
 - $\mathbf{U}$ Matrix of reciprocals of the effective population sizes ($1 / N_e$). These are on the diagonal, the rest is 0.
+- $(\mathbf{M}^r)^{\prime}$: M transponiert
 
 ```{r echo = FALSE}
-amount_groups <- 5
-group_matrix <- matrix(data = rep(0, amount_groups^2), nrow = amount_groups, ncol = amount_groups)
-
-Ne <- 20
-U <- group_matrix
-diag(U) <- 1/Ne
-```
+renderPlot({
+  amount_groups <- 5
+  group_matrix <- matrix(data = rep(0, amount_groups^2), nrow = amount_groups, ncol = amount_groups)
+  
+  Ne <- 20
+  U <- group_matrix
+  diag(U) <- 1/Ne
+  
+  M <- group_matrix
+  M[] <- 0.2
+  
+  V = M * U * t(M) 
+  
+  longM <- reshape2::melt(M)
+  longU <- reshape2::melt(U)
+  longV <- reshape2::melt(V)
+  
+  Mplot <- ggplot(longM, aes(x = Var2, y = Var1)) + 
+    geom_raster(aes(fill=value)) +
+    geom_text(aes(x = Var2, y = Var1, label = value))
+  Uplot <- ggplot(longU, aes(x = Var2, y = Var1)) + 
+    geom_raster(aes(fill=value)) +
+    geom_text(aes(x = Var2, y = Var1, label = value))
+  Vplot <- ggplot(longV, aes(x = Var2, y = Var1)) + 
+    geom_raster(aes(fill=value)) +
+    geom_text(aes(x = Var2, y = Var1, label = value))
+  
+  cowplot::plot_grid(Mplot, Uplot, Vplot, labels = c("M", "U", "V"), nrow = 2, ncol = 2)
+},
+height = 800
+)
+``` 
 
 $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
 
