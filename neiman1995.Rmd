@@ -683,16 +683,24 @@ renderPlot({
   
   Mplot <- ggplot(longM, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5)
+    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5) +
+    scale_y_reverse(sec.axis = dup_axis()) +
+    scale_x_continuous(sec.axis = dup_axis())
   Mtplot <- ggplot(longMt, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5)
+    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5) +
+    scale_y_reverse(sec.axis = dup_axis()) +
+    scale_x_continuous(sec.axis = dup_axis())
   Uplot <- ggplot(longU, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5)
+    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5) +
+    scale_y_reverse(sec.axis = dup_axis()) +
+    scale_x_continuous(sec.axis = dup_axis())
   Vplot <- ggplot(longV, aes(x = Var2, y = Var1)) + 
     geom_raster(aes(fill=value)) +
-    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5)
+    geom_text(aes(x = Var2, y = Var1, label = value), color = "white", size = 5) +
+    scale_y_reverse(sec.axis = dup_axis()) +
+    scale_x_continuous(sec.axis = dup_axis())
   
   cowplot::plot_grid(Mplot, Mtplot, Uplot, Vplot, labels = c("M", "M'", "U", "V"), nrow = 2, ncol = 2)
 },
