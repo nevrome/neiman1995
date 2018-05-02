@@ -645,6 +645,17 @@ $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^
 - $\mathbf{U}$ Matrix of reciprocals of the effective population sizes ($1 / N_e$). These are on the diagonal, the rest is 0.
 - $(\mathbf{M}^r)^{\prime}$: M transponiert
 
+$$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
+
+- $v_{ii}^{(t)}$: Diagonal element of $\mathbf{V}^{(t)}$ -- a variance. The square of of the departure of the variant frequency in the $i$'th deme at time $t$ from its starting frequency when the demes were identical, standardized by the variance of that starting frequency.
+- $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes i and j, again standardized by the variance of the starting frequency. 
+
+### Woodland Interassemblage Distance
+
+#### Diversity and Distance for Individual Assemblages *p.26-27* **(12)**
+
+$$\bar{d}_{i}^{2} = \sum_{j = 1}^{n} d_{ij}^{2} / (n - 1), i \neq j$$
+
 ```{r echo = FALSE}
 inputPanel(
   sliderInput("Ne_matrix", label = "Ne",
@@ -656,7 +667,18 @@ inputPanel(
 
 matrix_calculation_data <- eventReactive(
   input$run_button_matrix_calculation, {
-    multi_group_matrizes(input$Ne_matrix, input$t_matrix)
+    Mk <- function(k) {
+      M <- matrix(data = rep(0, 5^2), nrow = 5, ncol = 5)
+      #M[] <- 0.2
+      M[1,] <- c(0.4, 0.0, 0.2, 0.0, 0.4)
+      M[2,] <- c(0.0, 0.4, 0.2, 0.4, 0.0)
+      M[3,] <- c(0.2, 0.2, 0.2, 0.2, 0.2)
+      M[4,] <- c(0.2, 0.1, 0.3, 0.2, 0.2)
+      M[5,] <- c(0.2, 0.3, 0.1, 0.2, 0.2)
+      M
+    }
+    
+    multi_group_matrizes(input$Ne_matrix, input$t_matrix, Mk)
   },
   ignoreNULL = FALSE
 )
@@ -681,17 +703,4 @@ renderPlot({
 height = 1200
 )
 ``` 
-
-$$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
-
-- $v_{ii}^{(t)}$: Diagonal element of $\mathbf{V}^{(t)}$ -- a variance. The square of of the departure of the variant frequency in the $i$'th deme at time $t$ from its starting frequency when the demes were identical, standardized by the variance of that starting frequency.
-- $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes i and j, again standardized by the variance of the starting frequency. 
-
-
-### Woodland Interassemblage Distance
-
-#### Diversity and Distance for Individual Assemblages *p.26-27* **(12)**
-
-$$\bar{d}_{i}^{2} = \sum_{j = 1}^{n} d_{ij}^{2} / (n - 1), i \neq j$$
-
 
