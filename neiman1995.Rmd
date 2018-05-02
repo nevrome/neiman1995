@@ -704,3 +704,67 @@ height = 1200
 )
 ``` 
 
+Simulation with matrix calculation results
+
+```{r echo = FALSE}
+inputPanel(
+  sliderInput("k_group_3", label = "k",
+               min = 5, max = 15, value = 10, step = 1),
+  sliderInput("N_group_3", label = "N",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_final_group_3", label = "t",
+               min = 20, max = 200, value = 20, step = 20),
+  sliderInput("mi_3", label = "mi",
+               min = 0, max = 1, value = 0.1, step = 0.01),
+  sliderInput("sim_runs_2", label = "Number of simulation runs",
+               min = 1, max = 100, value = 20, step = 1),
+  actionButton("run_button_group_drift_simulation_iter_2", "Run simulation")
+)
+
+group_drift_simulation_data_3 <- eventReactive(
+  input$run_button_group_drift_simulation_iter_2, {
+    
+    mixed_list <- list()
+    
+    res_list <- list()
+    for (i in 1:input$sim_runs_2) {
+      res_list[[i]] <- calculate_sed_for_group_drift_simulation_result(
+        group_drift_simulation(
+          input$k_group_3, 
+          input$N_group_3, 
+          input$t_final_group_3, 
+          input$mi_3
+        ),
+        sim_run = i
+      ) 
+    }
+    
+    mixed_list[[1]] <- do.call(rbind, res_list)
+    
+    Mk_2 <- function(k) {
+      M <- matrix(data = rep(0, 2^2), nrow = 2, ncol = 2)
+      #M[] <- 0.2
+      M[1,] <- c(1 - input$mi_3, input$mi_3)
+      M[2,] <- c(input$mi_3, 1 - input$mi_3)
+      M
+    }
+    
+    mixed_list[[2]] <- multi_group_matrizes(input$N_group_3, input$t_final_group_3, Mk_2)
+    
+    mixed_list
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  mixed_list <- group_drift_simulation_data_3()
+  
+  mixed_list[[1]] %>%
+    ggplot() +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
+      geom_line(aes(x = t, y = sed, group = sim_run), color = "black", size = 1, alpha = 0.3) +
+      geom_point(aes(x = t, y = sed), color = "black", size = 1) +
+      theme_bw()
+})
+```
