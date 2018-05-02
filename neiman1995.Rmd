@@ -19,10 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r echo = FALSE}
 library(ggplot2)
 library(magrittr)
-
-source("./R/group_drift_simulation.R", local = TRUE)
-source("./R/squared_euclidian_distance.R", local = TRUE)
-source("./R/multi_group_matrix_calculation.R", local = TRUE)
+purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 ```
 
 ### Drift, Innovation and Diversity
