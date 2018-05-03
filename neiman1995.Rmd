@@ -123,33 +123,45 @@ renderPlot({
 
 #### Homogeneity Under Drift *p.10-12* **(1)**
 
-The theory of neutral alleles allows to describe the within-population homogeneity $F$ as a function of the effective population size $N_e$. $F$ is the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant. In a given time period the probability of drawing an individual, who learned from the same model as some other randomly selected individual in the previous time period, is $1 / N$. The probability of the opposite is $1 - (1 / N)$. $F_{t - 1}$ is the probability that the model of the second individual learned from the same model as the model of the first indivudual in an earlier timestep. $F_t$ can be calculated by takign all this probabilities into consideration.  
+The theory of neutral alleles allows to describe the within-population homogeneity $F$ as a function of the effective population size $N_e$. $F$ is the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant. In a given time period the probability of drawing an individual, who learned from the same model as some other randomly selected individual in the previous time period, is $1 / N$. The probability of the opposite is $1 - (1 / N)$. $F_{t - 1}$ is the probability that the model of the second individual learned from the same model as the model of the first indivudual in an earlier timestep. $F_t$ can be calculated by taking all this probabilities into consideration.  
 
 $$F_t = \frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}$$
+
+As an effect of drift, $F_t$ approaches one as $t$ increases.
 
 - $F_t$: Within-population homogeneity. That's the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant at a certain timestep
 - $F_{t - 1}$: Probability that the model of the second individual learned from the same model as the model of the first indivudual in an earlier timestep
 
 ```{r echo=FALSE}
 Ft <- function(F0, Ne, t) {
-  if(t == 0) {return(F0)}
+  if(t == 0) { return(F0) }
   1/Ne + (1 - 1/Ne) * Ft(F0, Ne, t - 1)
 }
 
 inputPanel(
-  sliderInput("F0", label = "F0 (Ft for t == 0)",
+  sliderInput("F0_homogeneity_drift", label = "F0 (Ft for t == 0)",
                min = 0, max = 1, value = 0.5, step = 0.05),
-  sliderInput("Ne", label = "Ne",
-               min = 10, max = 100, value = 20, step = 10)
+  sliderInput("Ne_homogeneity_drift", label = "Ne",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_homogeneity_drift", label = "t",
+               min = 50, max = 200, value = 100, step = 50)
 )
 
 renderPlot({
-  this_t = 1:100
-  this_Ft <- sapply(this_t, function(x) {Ft(input$F0, input$Ne, x)})
+  
+  # read input
+  F0 <- input$F0_homogeneity_drift
+  Ne <- input$Ne_homogeneity_drift
+  t <- input$t_homogeneity_drift
+  
+  timesteps = 0:t
+  
+  # apply function for all timesteps
+  Ft <- sapply(timesteps, function(x) { Ft(F0, Ne, x) })
   
   data.frame(
-    t = this_t,
-    Ft <- this_Ft
+    t = timesteps,
+    Ft = Ft
   ) %>%
     ggplot() +
     geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
@@ -160,6 +172,8 @@ renderPlot({
 ```
 
 #### Temporal Dynamics of Drift and Innovation *p.12-14*
+
+
 
 - $μ$: innovation rate
 
