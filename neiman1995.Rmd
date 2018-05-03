@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r echo = FALSE}
 library(ggplot2)
 library(magrittr)
-library(expm)
+suppressMessages(library(expm))
 purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 ```
 
