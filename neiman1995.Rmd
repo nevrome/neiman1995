@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This document visualizes the simulations and the general model functions in Fraser D. Neimans article *Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages* [@neiman_stylistic_1995]. 
 
-The document mirrors the structure in the article and should be read in conjunction with it. It can be used to deepen the understanding of the complex variable relations, but it doesn't attempt to retell the story.
+The document mirrors the structure in the article and should be read in conjunction with it. It can be used to deepen the understanding of the complex variable relations, but it doesn't attempt to retell the story. The small descriptive texts are compiled from the article and may contain sentences copied verbatimly.
 
 ```{r echo = FALSE}
 # load the packages, that are inconvinient to reference directly via namespace::
@@ -34,20 +34,22 @@ purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 
 #### Temporal Dynamics of Drift *p.10*
 
-Minimal simulation of drift in a population of $N$ individuals with $k$ variants over $t$ timesteps. Drift is sampling error that accompanies all forms of cultural transmission and causes individual variants to vanish or dominate randomly. Drift causes one variant to dominate and eradicate all the other variants.
+Minimal simulation of drift in a population of $N$ individuals with $k$ variants over $t$ timesteps. Drift is sampling error that accompanies all forms of cultural transmission and causes individual variants to vanish or dominate randomly. It causes one variant to dominate and eradicate all the others. The speed with which the variation is destroyed increases as the population size decreases.  
 
-- $k$: amount of variants
-- $N$: population size
-- $t$: time / number of iterations
+Mechanics of the simulation: In each timestep every individual randomly adopts a variant from somebody else. The probability of getting somebody elses variant is $(N - 1) / N$ while the probability of keeping the own variant is only $1 / N$. 
+
+- $k$: Amount of variants in a population
+- $N_e$: Size of the effective population. The effective population consists of the individuals within a population that is activly involved in a cultural transmission process
+- $t$: Time / number of iterations
 
 ```{r echo=FALSE}
 inputPanel(
   sliderInput("k_drift_simulation", label = "k",
                min = 5, max = 15, value = 10, step = 1),
-  sliderInput("N_drift_simulation", label = "N",
+  sliderInput("N_e_drift_simulation", label = "Ne",
                min = 10, max = 100, value = 20, step = 10),
   sliderInput("t_drift_simulation", label = "t",
-             min = 50, max = 200, value = 100, step = 50),
+               min = 50, max = 200, value = 100, step = 50),
   actionButton("run_button_drift_simulation", "Run simulation")
 )
 
@@ -56,7 +58,7 @@ drift_simulation_data <- eventReactive(
     
     # read input
     k <- input$k_drift_simulation
-    N <- input$N_drift_simulation
+    N <- input$N_e_drift_simulation
     t <- input$t_drift_simulation
     
     # calculate population parameters
@@ -121,14 +123,12 @@ renderPlot({
 
 #### Homogeneity Under Drift *p.10-12* **(1)**
 
-The amount of increase in homogeneity in each time period is inversely proportional to the effective population size.
+The theory of neutral alleles allows to describe the within-population homogeneity $F$ as a function of the effective population size $N_e$. $F$ is the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant. In a given time period the probability of drawing an individual, who learned from the same model as some other randomly selected individual in the previous time period, is $1 / N$. The probability of the opposite is $1 - (1 / N)$. $F_{t - 1}$ is the probability that the model of the second individual learned from the same model as the model of the first indivudual in an earlier timestep. $F_t$ can be calculated by takign all this probabilities into consideration.  
 
 $$F_t = \frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}$$
 
-- $F_t$: within-population homogeneity (probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant) at a certain timestep
-- $F_{t - 1}$: there is always a chance that this second individual's model learned from the same model as did the first individual's model in a still earlier time period
-- $t$: time
-- $N_e$: size of the effective population
+- $F_t$: Within-population homogeneity. That's the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant at a certain timestep
+- $F_{t - 1}$: Probability that the model of the second individual learned from the same model as the model of the first indivudual in an earlier timestep
 
 ```{r echo=FALSE}
 Ft <- function(F0, Ne, t) {
