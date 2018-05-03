@@ -1,7 +1,7 @@
-multi_group_matrizes <- function(Ne, t, Mk) {
+multi_group_matrizes <- function(Ne, t, Mk, mi_3) {
   
   k <- 1
-  amount_groups <- nrow(Mk(k))
+  amount_groups <- nrow(Mk(k, mi_3))
 
   group_matrix <- matrix(data = rep(0, amount_groups^2), nrow = amount_groups, ncol = amount_groups)
 
@@ -13,7 +13,7 @@ multi_group_matrizes <- function(Ne, t, Mk) {
   matrix_time_list <- list()
   
   for (pk in 1:t) {
-    matrix_time_list[[pk]] <- M(k)  %*% U  %*% t(M(k)) 
+    matrix_time_list[[pk]] <- M(k, mi_3)  %*% U  %*% t(M(k, mi_3)) 
   }
   
   V <- Reduce(`+`, matrix_time_list) 
@@ -33,8 +33,8 @@ multi_group_matrizes <- function(Ne, t, Mk) {
   }
   
   list(
-    longM = reshape2::melt(M(k)),
-    longMt = reshape2::melt(t(M(k))),
+    longM = reshape2::melt(M(k, mi_3)),
+    longMt = reshape2::melt(t(M(k, mi_3))),
     longU = reshape2::melt(U),
     longV = reshape2::melt(V),
     longmosed = reshape2::melt(mosed),
