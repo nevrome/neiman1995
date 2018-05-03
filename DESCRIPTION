@@ -4,6 +4,7 @@ Version: 0.0.1
 Imports:
   cowplot,
   dplyr,
+  expm,
   ggplot2,
   knitr,
   magrittr,

@@ -13,7 +13,7 @@ multi_group_matrizes <- function(Ne, t, Mk, mi_3) {
   matrix_time_list <- list()
   
   for (pk in 1:t) {
-    matrix_time_list[[pk]] <- M(k, mi_3)  %*% U  %*% t(M(k, mi_3)) 
+    matrix_time_list[[pk]] <- (M(k, mi_3) %^% pk) %*% U %*% t(M(k, mi_3) %^% pk) 
   }
   
   V <- Reduce(`+`, matrix_time_list) 
