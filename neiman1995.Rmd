@@ -59,12 +59,12 @@ drift_simulation_data <- eventReactive(
     # read input
     k <- input$k_drift_simulation
     N <- input$N_e_drift_simulation
-    t <- input$t_drift_simulation
+    time <- input$t_drift_simulation
     
     # calculate population parameters
     population <- 1:N
     variants <- 1:k
-    timesteps <- 2:t
+    timesteps <- 2:time
     
     # create initial population
     pop0 <- tibble::tibble(
@@ -104,6 +104,7 @@ drift_simulation_data <- eventReactive(
         fill = list(individuals_with_variant = as.integer(0))
       )
     
+    pop_devel_sum
   },
   ignoreNULL = FALSE
 )
@@ -112,11 +113,11 @@ renderPlot({
   
   drift_simulation_data() %>%
     ggplot() +
-    geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
-    geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
-    theme_bw() +
-    xlab("time / number of iterations") +
-    ylab("variants and their occurence in the population [%]")
+      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+      theme_bw() +
+      xlab("time / number of iterations") +
+      ylab("variants and their occurence in the population [%]")
   
 })
 ```
@@ -133,9 +134,9 @@ As an effect of drift, $F_t$ approaches one as $t$ increases.
 - $F_{t - 1}$: Probability that the model of the second individual learned from the same model as the model of the first indivudual in an earlier timestep
 
 ```{r echo=FALSE}
-Ft <- function(F0, Ne, t) {
-  if(t == 0) { return(F0) }
-  1/Ne + (1 - 1/Ne) * Ft(F0, Ne, t - 1)
+Ft <- function(F0, Ne, time) {
+  if(time == 0) { return(F0) }
+  1/Ne + (1 - 1/Ne) * Ft(F0, Ne, time - 1)
 }
 
 inputPanel(
@@ -152,9 +153,9 @@ renderPlot({
   # read input
   F0 <- input$F0_homogeneity_drift
   Ne <- input$Ne_homogeneity_drift
-  t <- input$t_homogeneity_drift
+  time <- input$t_homogeneity_drift
   
-  timesteps = 0:t
+  timesteps <- 0:time
   
   # apply function for all timesteps
   Ft <- sapply(timesteps, function(x) { Ft(F0, Ne, x) })
@@ -173,54 +174,62 @@ renderPlot({
 
 #### Temporal Dynamics of Drift and Innovation *p.12-14*
 
+Simulation built on the first simple drift simulation. Here the concept of innovation is added: Individuals can not just inherit but also create new variants with the probability $μ$. In this context $k$ is just the initial number of variants at $t == 0$. The effect of drift is still strongly visible, but with increasing $μ$ it becomes less relevant. New variants can form and replace the dominant one. 
 
+Mechanics of the simulation: The simulation works like the first one, but now there's a chance of $μ$ for every indivual in every timestep to create a new variant.
 
-- $μ$: innovation rate
+- $μ$: Innovation rate. Probability of the creation of a new variant
 
 ```{r echo=FALSE}
 inputPanel(
-  sliderInput("k_2", label = "k for t == 0",
+  sliderInput("k_drift_simulation_with_innovation", label = "k for t == 0",
                min = 5, max = 15, value = 10, step = 1),
-  sliderInput("N_2", label = "N",
+  sliderInput("N_drift_simulation_with_innovation", label = "N",
                min = 10, max = 100, value = 20, step = 10),
-  sliderInput("t_final_2", label = "t",
+  sliderInput("t_drift_simulation_with_innovation", label = "t",
                min = 50, max = 200, value = 100, step = 50),
-  sliderInput("mu_sim", label = "μ",
+  sliderInput("mu_drift_simulation_with_innovation", label = "μ",
                min = 0, max = 0.1, value = 0.01, step = 0.01),
-  actionButton("run_button_drift_simulation_innovation", "Run simulation")
+  actionButton("run_button_drift_simulation_with_innovation", "Run simulation")
 )
 
-drift_simulation_plot_2 <- eventReactive(
-  input$run_button_drift_simulation_innovation, {
-    k <- input$k_2
-    N <- input$N_2
-    t_final <- input$t_final_2
-    mu_sim <- input$mu_sim
+drift_simulation_with_innovation_data <- eventReactive(
+  input$run_button_drift_simulation_with_innovation, {
+    
+    # read input
+    k <- input$k_drift_simulation_with_innovation
+    N <- input$N_drift_simulation_with_innovation
+    time <- input$t_drift_simulation_with_innovation
+    mu <- input$mu_drift_simulation_with_innovation
   
+    # prepare population parameters
     population <- 1:N
     variants <- 1:k
-    timesteps <- 2:t_final
+    timesteps <- 2:time
   
+    # create starting population
     pop0 <- tibble::tibble(
-      time = as.integer(1),
+      time = as.integer(0),
       individual = 1:N,
       variant = rep_len(1:k, N)
     )
   
+    # list to store population stages over time
     pop_devel <- list()
     pop_devel[[1]] <- pop0
   
+    # simulation loop
     last_variant <- max(pop_devel[[1]]$variant)
     for (p1 in timesteps) {
       pop_new <- pop_devel[[p1 - 1]]
-      pop_new$time <- p1
+      pop_new$time <- p1 - 1
       pop_new$variant <- sample(pop_new$variant, length(pop_new$variant), replace = T)
   
       # innovation
       innovate_here <- sample(
         c(TRUE, FALSE), 
         length(pop_new$variant), 
-        prob = c(mu_sim, 1 - mu_sim), 
+        prob = c(mu, 1 - mu), 
         replace = T
       )
       new_variants <- seq(last_variant + 1, last_variant + sum(innovate_here))
@@ -230,8 +239,10 @@ drift_simulation_plot_2 <- eventReactive(
       pop_devel[[p1]] <- pop_new
     }
   
+    # bind individual population stages into data.frame
     pop_devel_df <- do.call(rbind, pop_devel)
-  
+    
+    # calculate number of individuals per timestep and variant
     pop_devel_sum <- pop_devel_df %>%
       dplyr::group_by(
         time, variant
@@ -240,26 +251,26 @@ drift_simulation_plot_2 <- eventReactive(
         individuals_with_variant = n()
       ) %>%
       dplyr::ungroup() %>%
-      # that's just to fil gaps in the area plot
       tidyr::complete(
         time, 
         variant, 
         fill = list(individuals_with_variant = as.integer(0))
       )
+    
+    pop_devel_sum
   
-    pop_devel_sum %>%
-      ggplot() +
-      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
-      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
-      theme_bw() +
-      xlab("time / number of iterations") +
-      ylab("variants and their occurence in the population [%]")
   },
   ignoreNULL = FALSE
 )
 
 renderPlot({
-  drift_simulation_plot_2()
+  drift_simulation_with_innovation_data() %>%
+    ggplot() +
+      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+      theme_bw() +
+      xlab("time / number of iterations") +
+      ylab("variants and their occurence in the population [%]")
 })
 ```
 
