@@ -12,18 +12,21 @@ bibliography: references.bib
 link-citations: true
 ---
 
-This document visualizes the simulations and the general model functions in Fraser D. Neimans article *Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages* [@neiman_stylistic_1995]. 
-
-The document structure mirrors the structure in the article and should be read in conjunction with it. It can be used to deepen the understanding of the complex variable relations, but it doesn't attempt to retell the story.   
-
 ```{r include=FALSE}
+# knitr chunk settings
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+This document visualizes the simulations and the general model functions in Fraser D. Neimans article *Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages* [@neiman_stylistic_1995]. 
+
+The document mirrors the structure in the article and should be read in conjunction with it. It can be used to deepen the understanding of the complex variable relations, but it doesn't attempt to retell the story.
+
 ```{r echo = FALSE}
+# load the packages, that are inconvinient to reference directly via namespace::
 library(ggplot2)
 library(magrittr)
 suppressMessages(library(expm))
+# load the functions in the source files
 purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 ```
 
@@ -31,49 +34,59 @@ purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 
 #### Temporal Dynamics of Drift *p.10*
 
+Minimal simulation of drift in a population of $N$ individuals with $k$ variants over $t$ timesteps. Drift is sampling error that accompanies all forms of cultural transmission and causes individual variants to vanish or dominate randomly. Drift causes one variant to dominate and eradicate all the other variants.
+
 - $k$: amount of variants
 - $N$: population size
 - $t$: time / number of iterations
 
 ```{r echo=FALSE}
 inputPanel(
-  sliderInput("k", label = "k",
+  sliderInput("k_drift_simulation", label = "k",
                min = 5, max = 15, value = 10, step = 1),
-  sliderInput("N", label = "N",
+  sliderInput("N_drift_simulation", label = "N",
                min = 10, max = 100, value = 20, step = 10),
-  sliderInput("t_final", label = "t",
+  sliderInput("t_drift_simulation", label = "t",
              min = 50, max = 200, value = 100, step = 50),
   actionButton("run_button_drift_simulation", "Run simulation")
 )
 
-drift_simulation_plot <- eventReactive(
+drift_simulation_data <- eventReactive(
   input$run_button_drift_simulation, {
-    k <- input$k
-    N <- input$N
-    t_final <- input$t_final
     
+    # read input
+    k <- input$k_drift_simulation
+    N <- input$N_drift_simulation
+    t <- input$t_drift_simulation
+    
+    # calculate population parameters
     population <- 1:N
     variants <- 1:k
-    timesteps <- 2:t_final
+    timesteps <- 2:t
     
+    # create initial population
     pop0 <- tibble::tibble(
-      time = as.integer(1),
+      time = as.integer(0),
       individual = 1:N,
       variant = rep_len(1:k, N)
     )
     
+    # list to store population stages over time
     pop_devel <- list()
     pop_devel[[1]] <- pop0
     
+    # simulation loop
     for (p1 in timesteps) {
       pop_new <- pop_devel[[p1 - 1]] 
-      pop_new$time <- p1
+      pop_new$time <- p1 - 1
       pop_new$variant <- sample(pop_new$variant, length(pop_new$variant), replace = T)
       pop_devel[[p1]] <- pop_new
     }
     
+    # bind individual population stages into data.frame
     pop_devel_df <- do.call(rbind, pop_devel)
     
+    # calculate number of individuals per timestep and variant
     pop_devel_sum <- pop_devel_df %>%
       dplyr::group_by(
         time, variant
@@ -82,26 +95,27 @@ drift_simulation_plot <- eventReactive(
         individuals_with_variant = n()
       ) %>%
       dplyr::ungroup() %>%
-      # that's just to fil gaps in the area plot
+      # complete (expand.grid) to fill gaps in the area plot
       tidyr::complete(
         time, 
         variant, 
         fill = list(individuals_with_variant = as.integer(0))
       )
     
-    pop_devel_sum %>%
-      ggplot() +
-      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
-      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
-      theme_bw() +
-      xlab("time / number of iterations") +
-      ylab("variants and their occurence in the population [%]")
   },
   ignoreNULL = FALSE
 )
 
 renderPlot({
-  drift_simulation_plot()
+  
+  drift_simulation_data() %>%
+    ggplot() +
+    geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+    geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+    theme_bw() +
+    xlab("time / number of iterations") +
+    ylab("variants and their occurence in the population [%]")
+  
 })
 ```
 
