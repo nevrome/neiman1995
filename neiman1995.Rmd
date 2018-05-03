@@ -756,12 +756,12 @@ group_drift_simulation_data_3 <- eventReactive(
     }
     
     sqe_m <- c() 
-    for (t_m in 1:t_final_group_3) {
+    for (t_m in 0:t_final_group_3) {
       #print(multi_group_matrizes(N_group_3, t_m, Mk_2)$longmosed)
-      sqe_m[t_m] <- multi_group_matrizes(N_group_3, t_m, Mk_2, mi_3)$longmosed$value[2]
+      sqe_m[t_m + 1] <- multi_group_matrizes(N_group_3, t_m, Mk_2, mi_3)$longmosed$value[2]
     }
     
-    mixed_list[[2]] <- data.frame(t = 1:t_final_group_3, sed = sqe_m)
+    mixed_list[[2]] <- data.frame(t = 0:t_final_group_3, sed = sqe_m)
     
     mixed_list
   },

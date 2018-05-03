@@ -5,13 +5,13 @@ group_drift_simulation <- function(k, N, t_final, mi) {
   timesteps <- 2:t_final
   
   popA0 <- tibble::tibble(
-    time = as.integer(1),
+    time = as.integer(0),
     individual = 1:N,
     variant = rep_len(1:k, N),
     group = "A"
   )
   popB0 <- tibble::tibble(
-    time = as.integer(1),
+    time = as.integer(0),
     individual = 1:N,
     variant = rep_len(1:k, N),
     group = "B"
@@ -26,8 +26,8 @@ group_drift_simulation <- function(k, N, t_final, mi) {
     popA_new <- popA_devel[[p1 - 1]]
     popB_new <- popB_devel[[p1 - 1]]
     
-    popA_new$time <- p1
-    popB_new$time <- p1
+    popA_new$time <- p1 - 1
+    popB_new$time <- p1 - 1
 
     exchange_here <- sample(
       c(TRUE, FALSE), 
