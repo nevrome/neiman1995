@@ -8,9 +8,11 @@ output:
     toc: true
     toc_depth: 4
 runtime: shiny
+bibliography: references.bib
+link-citations: true
 ---
 
-This document visualizes the general model functions in Fraser D. Neimans article *Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages* from 1995. 
+This document visualizes the general model functions in Fraser D. Neimans article *Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages* from 1995 [@neiman_stylistic_1995]. 
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -792,3 +794,5 @@ renderPlot({
     theme_bw()
 })
 ```
+
+### Literature
