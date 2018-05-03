@@ -46,7 +46,7 @@ Mechanics of the simulation: In each timestep every individual randomly adopts a
 inputPanel(
   sliderInput("k_drift_simulation", label = "k",
                min = 5, max = 15, value = 10, step = 1),
-  sliderInput("N_e_drift_simulation", label = "Ne",
+  sliderInput("Ne_drift_simulation", label = "Ne",
                min = 10, max = 100, value = 20, step = 10),
   sliderInput("t_drift_simulation", label = "t",
                min = 50, max = 200, value = 100, step = 50),
@@ -58,7 +58,7 @@ drift_simulation_data <- eventReactive(
     
     # read input
     k <- input$k_drift_simulation
-    N <- input$N_e_drift_simulation
+    N <- input$Ne_drift_simulation
     time <- input$t_drift_simulation
     
     # calculate population parameters
@@ -158,11 +158,11 @@ renderPlot({
   timesteps <- 0:time
   
   # apply function for all timesteps
-  Ft <- sapply(timesteps, function(x) { Ft(F0, Ne, x) })
+  Ft_time <- sapply(timesteps, function(x) { Ft(F0, Ne, x) })
   
   data.frame(
     t = timesteps,
-    Ft = Ft
+    Ft = Ft_time
   ) %>%
     ggplot() +
     geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
@@ -174,7 +174,7 @@ renderPlot({
 
 #### Temporal Dynamics of Drift and Innovation *p.12-14*
 
-Simulation built on the first simple drift simulation. Here the concept of innovation is added: Individuals can not just inherit but also create new variants with the probability $μ$. In this context $k$ is just the initial number of variants at $t == 0$. The effect of drift is still strongly visible, but with increasing $μ$ it becomes less relevant. New variants can form and replace the dominant one. 
+Simulation built on the first simple drift simulation. Here the concept of innovation is added: Individuals can not just inherit but also create new variants with the probability $μ$. In this context $k$ is just the initial number of variants at $t = 0$. The effect of drift is still strongly visible, but with increasing $μ$ it becomes less relevant. New variants can form and replace the dominant one. 
 
 Mechanics of the simulation: The simulation works like the first one, but now there's a chance of $μ$ for every indivual in every timestep to create a new variant.
 
@@ -184,7 +184,7 @@ Mechanics of the simulation: The simulation works like the first one, but now th
 inputPanel(
   sliderInput("k_drift_simulation_with_innovation", label = "k for t == 0",
                min = 5, max = 15, value = 10, step = 1),
-  sliderInput("N_drift_simulation_with_innovation", label = "N",
+  sliderInput("Ne_drift_simulation_with_innovation", label = "Ne",
                min = 10, max = 100, value = 20, step = 10),
   sliderInput("t_drift_simulation_with_innovation", label = "t",
                min = 50, max = 200, value = 100, step = 50),
@@ -198,7 +198,7 @@ drift_simulation_with_innovation_data <- eventReactive(
     
     # read input
     k <- input$k_drift_simulation_with_innovation
-    N <- input$N_drift_simulation_with_innovation
+    N <- input$Ne_drift_simulation_with_innovation
     time <- input$t_drift_simulation_with_innovation
     mu <- input$mu_drift_simulation_with_innovation
   
@@ -279,27 +279,38 @@ renderPlot({
 $$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
 
 ```{r echo=FALSE}
-Ft_2 <- function(F0, Ne, t, mu) {
-  if(t == 0) {return(F0)}
-  (1/Ne + (1 - 1/Ne) * Ft_2(F0, Ne, t - 1, mu)) * (1 - mu)^2
+Ft_innovation <- function(F0, Ne, time, mu) {
+  if(time == 0) {return(F0)}
+  (1/Ne + (1 - 1/Ne) * Ft_innovation(F0, Ne, time - 1, mu)) * (1 - mu)^2
 }
 
 inputPanel(
-  sliderInput("F0_2", label = "F0 (Ft for t == 0)",
+  sliderInput("F0_homogeneity_drift_with_innovation", label = "F0 (Ft for t == 0)",
                min = 0, max = 1, value = 0.5, step = 0.05),
-  sliderInput("Ne_2", label = "Ne",
+  sliderInput("Ne_homogeneity_drift_with_innovation", label = "Ne",
                min = 10, max = 100, value = 20, step = 10),
-  sliderInput("mu_2", label = "μ",
+  sliderInput("t_homogeneity_drift_with_innovation", label = "t",
+               min = 50, max = 200, value = 100, step = 50),
+  sliderInput("mu_homogeneity_drift_with_innovation", label = "μ",
                min = 0, max = 1, value = 0.1, step = 0.1)
 )
 
 renderPlot({
-  this_t_2 = 1:100
-  this_Ft_2 <- sapply(this_t_2, function(x) {Ft_2(input$F0_2, input$Ne_2, x, input$mu_2)})
+  
+  # read input
+  F0 <- input$F0_homogeneity_drift_with_innovation
+  Ne <- input$Ne_homogeneity_drift_with_innovation
+  mu <- input$mu_homogeneity_drift_with_innovation
+  time <- input$t_homogeneity_drift_with_innovation
+  
+  timesteps <- 0:time
+  
+  # apply function for every timestep
+  Ft_innovation_time <- sapply(timesteps, function(x) {Ft_innovation(F0, Ne, x, mu)})
   
   data.frame(
-    t = this_t_2,
-    Ft <- this_Ft_2
+    t = timesteps,
+    Ft = Ft_innovation_time
   ) %>%
     ggplot() +    
     geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
