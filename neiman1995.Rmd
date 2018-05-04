@@ -546,7 +546,7 @@ renderPlot({
 
 #### Diversity and Sample Size *p.15-16* **(8)** **(9)**
 
-One problem of the set of equations so far is that the frequency of variants in a population of social learners is not equal to the frequency preserved and documented in the archaeological assemblage. Under appropriate taphonomic circumstances, however, they are surprisingly similar. Another problem arises because we try to estimate diversity only on the basis of a sample derived from a population. The equations (5) and (7) are similar to the Shannon-Weaver information statistic, which is senstitive to sample-size variation.
+One problem of the set of equations so far is that the frequency of variants in a population of social learners is not equal to the frequency preserved and documented in the archaeological assemblage. Under appropriate taphonomic circumstances, however, they are surprisingly similar. Another problem arises because we try to estimate diversity only on the basis of a sample derived from a population. The equations (5) and (7) are similar to the Shannon-Weaver information statistic, which is very senstitive to sample-size variation.
 
 $$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
 
@@ -559,17 +559,39 @@ H <- function(amount_of_variants) {
   -sum(p * log(p))
 }
 
+inputPanel(
+  sliderInput("k_shannon", label = "k",
+               min = 50, max = 150, value = 100, step = 10),
+  sliderInput("number_of_replications_shannon", label = "Number of random creations of p",
+               min = 100, max = 1000, value = 500, step = 100),
+  actionButton("run_button_shannon", "Run simulation")
+)
+
+shannon_data <- eventReactive(
+  input$run_button_shannon, {
+  
+    # read input  
+    number_of_replications <- input$number_of_replications_shannon
+    k <- input$k_shannon
+    
+    # calculate Fhat
+    tibble::tibble(
+      k = 0:k,
+      H_min = sapply(k, function(x) {
+        min(replicate(number_of_replications, H(x)))
+      }),
+      H_max = sapply(k, function(x) {
+        max(replicate(number_of_replications, H(x)))
+      }),
+      H_mean = (H_min + H_max) / 2
+    ) 
+    
+  },
+  ignoreNULL = FALSE
+)
+
 renderPlot({
-  tibble::tibble(
-    k = 0:100,
-    H_min = sapply(k, function(x) {
-      min(replicate(500, H(x)))
-    }),
-    H_max = sapply(k, function(x) {
-      max(replicate(500, H(x)))
-    }),
-    H_mean = (H_min + H_max) / 2
-  ) %>%
+  shannon_data() %>%
     ggplot() +    
       geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
       geom_ribbon(
