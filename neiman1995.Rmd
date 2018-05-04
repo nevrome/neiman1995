@@ -452,19 +452,24 @@ ne <- function(theta) {
 }
 
 inputPanel(
-  sliderInput("Ne_4", label = "Ne",
+  sliderInput("Ne_diversity_effective_number", label = "Ne",
                min = 10, max = 100, value = 20, step = 10),
-  sliderInput("mu_4", label = "μ",
+  sliderInput("mu_diversity_effective_number", label = "μ",
                min = 0, max = 1, value = 0.01, step = 0.01)
 )
 
 renderText({
-  paste0("1 * theta = ", theta(input$Ne_4, input$mu_4))
+  paste0("1 * theta = ", theta(input$Ne_diversity_effective_number, input$mu_diversity_effective_number))
 })
 
 renderPlot({
+  
+  # read input
+  Ne <- input$Ne_diversity_effective_number
+  mu <- input$mu_diversity_effective_number  
+  
   tibble::tibble(
-    theta = 0:100 * theta(input$Ne_4, input$mu_4),
+    theta = 0:100 * theta(Ne, mu),
     ne = sapply(theta, function(x) {ne(x)})
   ) %>%
     ggplot() +    
