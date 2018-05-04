@@ -348,23 +348,23 @@ Fhat <- function(theta) {
 }
 
 inputPanel(
-  sliderInput("Ne_3", label = "Ne",
+  sliderInput("Ne_homogeneity_equilibrium", label = "Ne",
                min = 10, max = 100, value = 20, step = 10),
-  sliderInput("mu_3", label = "μ",
+  sliderInput("mu_homogeneity_equilibrium", label = "μ",
                min = 0, max = 1, value = 0.1, step = 0.1)
 )
 
 renderText({
-  paste0("1 * theta = ", theta(input$Ne_3, input$mu_3))
+  paste0("1 * theta = ", theta(input$Ne_homogeneity_equilibrium, input$mu_homogeneity_equilibrium))
 })
 
 renderPlot({
-  theta = 0:100 * theta(input$Ne_3, input$mu_3)
-  this_Fhat <- sapply(theta, function(x) {Fhat(x)})
+  Ne <- input$Ne_homogeneity_equilibrium
+  mu <- input$mu_homogeneity_equilibrium
   
-  data.frame(
-    t = theta,
-    Fhat <- this_Fhat
+  tibble::tibble(
+    theta = 0:100 * theta(Ne, mu),
+    Fhat = sapply(theta, function(x) {Fhat(x)})
   ) %>%
     ggplot() +    
       geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
@@ -376,27 +376,31 @@ renderPlot({
 })
 ```
 
-The homogeneity of a population can also be described as a function of the relative frequency of the variants in it: $p$. $p_i$ is the relative frequency of the $i$'th variant in the population, so $p$ is a vector of frequencies with the sum one. The probability of of choosing a given variant at random is its relative frequency $p_i$, which is also the probability of picking another copy of this same variant on the second try. The probability of getting this variant twice in a row is therefore $p_i^2$. The total probability of getting any of the $i = 1$ to $k$ variants twice in a row is the sum of all these probabilities.
+The homogeneity $\hat{F}$ of a population can also be described as a function of the relative frequency of the variants in it: $p$. $p_i$ is the relative frequency of the $i$'th variant in the population, so $p$ is a vector of frequencies with the sum one. The probability of choosing a given variant at random is its relative frequency $p_i$, which is also the probability of picking another copy of this same variant on the second try. The probability of getting this variant twice in a row is therefore $p_i^2$. The total probability of getting any of the $i = 1$ to $k$ variants twice in a row is the sum of all these probabilities.
+
+For this plot $p$ is randomly drawn 500 times from a uniform distribution for every value of $k$. The black line shows the mean result for $\hat{F}$ the ribbon the min and max results.
 
 $$\hat{F} = \sum_{i=1}^{k} p^2_i$$
 
 - $p_i$: relative frequency of the i'th variant in the population 
 
 ```{r echo=FALSE}
-Fhat_2 <- function(amount_of_variants) {
+Fhat_relative_frequency <- function(amount_of_variants) {
   p <- runif(amount_of_variants)
   p <- p / sum(p)
   sum(p^2)
 }
 
 renderPlot({
+  number_of_replications <- 500
+  
   tibble::tibble(
     amount_of_variants = 0:100,
     Fhat_min = sapply(amount_of_variants, function(x) {
-      min(replicate(500, Fhat_2(x)))
+      min(replicate(number_of_replications, Fhat_relative_frequency(x)))
     }),
     Fhat_max = sapply(amount_of_variants, function(x) {
-      max(replicate(500, Fhat_2(x)))
+      max(replicate(number_of_replications, Fhat_relative_frequency(x)))
     }),
     Fhat_mean = (Fhat_min + Fhat_max) / 2
   ) %>%
