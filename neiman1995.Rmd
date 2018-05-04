@@ -483,6 +483,8 @@ renderPlot({
 
 Furthermore, it is clear that $θ$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population. We can call such estimates $t_F$, to distinguish them from the actual population values and to remind ourselves they are based on homogeneity $\hat{F}$ in Equation (5).
 
+Also for this plot $p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $t_F$ the ribbon the min and max results.
+
 $$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
 
 - $t_F$: Estimated $θ$ by the sum of squares of variant frequencies
@@ -494,24 +496,46 @@ theta_F <- function(amount_of_variants) {
   (1 / sum(p^2)) - 1
 }
 
+inputPanel(
+  sliderInput("k_reciprocal_relative_frequency", label = "k",
+               min = 50, max = 150, value = 100, step = 10),
+  sliderInput("number_of_replications_reciprocal_relative_frequency", label = "Number of random creations of p",
+               min = 100, max = 1000, value = 500, step = 100),
+  actionButton("run_button_reciprocal_relative_frequency", "Run simulation")
+)
+
+reciprocal_relative_frequency_data <- eventReactive(
+  input$run_button_reciprocal_relative_frequency, {
+  
+    # read input  
+    number_of_replications <- input$number_of_replications_reciprocal_relative_frequency
+    k <- input$k_reciprocal_relative_frequency
+    
+    # calculate Fhat
+    tibble::tibble(
+      k = 0:k,
+      theta_F_min = sapply(k, function(x) {
+        min(replicate(number_of_replications, theta_F(x)))
+      }),
+      theta_F_max = sapply(k, function(x) {
+        max(replicate(number_of_replications, theta_F(x)))
+      }),
+      theta_F_mean = (theta_F_min + theta_F_max) / 2
+    )
+    
+  },
+  ignoreNULL = FALSE
+)
+
 renderPlot({
-  tibble::tibble(
-    amount_of_variants = 0:100,
-    theta_F_min = sapply(amount_of_variants, function(x) {
-      min(replicate(500, theta_F(x)))
-    }),
-    theta_F_max = sapply(amount_of_variants, function(x) {
-      max(replicate(500, theta_F(x)))
-    }),
-    theta_F_mean = (theta_F_min + theta_F_max) / 2
-  ) %>%
+  reciprocal_relative_frequency_data() %>%
     ggplot() +    
       geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
       geom_ribbon(
-        aes(x = amount_of_variants, ymin = theta_F_min, ymax = theta_F_max), 
+        aes(x = k, ymin = theta_F_min, ymax = theta_F_max), 
         fill = "deepskyblue", alpha = 0.5
       ) +
-      geom_line(aes(x = amount_of_variants, y = theta_F_mean), size = 1) +
+      geom_line(aes(x = k, y = theta_F_mean), size = 1) +
       theme_bw() +
       xlab(latex2exp::TeX("k")) +
       ylab(latex2exp::TeX("t_F"))
