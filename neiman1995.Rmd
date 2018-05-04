@@ -481,9 +481,9 @@ renderPlot({
 })
 ```
 
-Furthermore, it is clear that $θ$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population. We can call such estimates $t_F$, to distinguish them from the actual population values and to remind ourselves they are based on homogeneity $\hat{F}$ in Equation (5).
+Furthermore, it is clear that $θ$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population. We can call such estimates $t_F$, to distinguish them from the actual population values and to remind ourselves they are based on homogeneity $\hat{F}$ in Equation (5). With this equation we can get useful insights into variations in $θ$ among groups or demes.
 
-Also for this plot $p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $t_F$ the ribbon the min and max results.
+For this plot $p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $t_F$ the ribbon the min and max results.
 
 $$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
 
@@ -546,6 +546,8 @@ renderPlot({
 
 #### Diversity and Sample Size *p.15-16* **(8)** **(9)**
 
+One problem of the set of equations so far is that the frequency of variants in a population of social learners is not equal to the frequency preserved and documented in the archaeological assemblage. Under appropriate taphonomic circumstances, however, they are surprisingly similar. Another problem arises because we try to estimate diversity only on the basis of a sample derived from a population. The equations (5) and (7) are similar to the Shannon-Weaver information statistic, which is senstitive to sample-size variation.
+
 $$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
 
 - $H$: [Shannon's diversity index](http://www.tiem.utk.edu/~gross/bioed/bealsmodules/shannonDI.html)
@@ -559,11 +561,11 @@ H <- function(amount_of_variants) {
 
 renderPlot({
   tibble::tibble(
-    amount_of_variants = 0:100,
-    H_min = sapply(amount_of_variants, function(x) {
+    k = 0:100,
+    H_min = sapply(k, function(x) {
       min(replicate(500, H(x)))
     }),
-    H_max = sapply(amount_of_variants, function(x) {
+    H_max = sapply(k, function(x) {
       max(replicate(500, H(x)))
     }),
     H_mean = (H_min + H_max) / 2
@@ -571,10 +573,10 @@ renderPlot({
     ggplot() +    
       geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
       geom_ribbon(
-        aes(x = amount_of_variants, ymin = H_min, ymax = H_max), 
+        aes(x = k, ymin = H_min, ymax = H_max), 
         fill = "deepskyblue", alpha = 0.5
       ) +
-      geom_line(aes(x = amount_of_variants, y = H_mean), color = "black", size = 1) +
+      geom_line(aes(x = k, y = H_mean), color = "black", size = 1) +
       theme_bw() +
       xlab(latex2exp::TeX("k")) +
       ylab(latex2exp::TeX("H"))
