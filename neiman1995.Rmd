@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This document visualizes the simulations and the general model functions in Fraser D. Neimans article *Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages* [@neiman_stylistic_1995]. 
 
-The document mirrors the structure in the article and should be read in conjunction with it. It can be used to deepen the understanding of the complex variable relations, but it doesn't attempt to retell the story. The small descriptive texts are compiled from the article and may contain sentences copied verbatimly.
+It mirrors the structure in the article and should be read in conjunction with it. It can be used to deepen the understanding of the complex variable relations, but it doesn't attempt to retell the story: the case study about woodland pottery isn't relevant here. The small descriptive texts are compiled from the article and also contain sentences copied verbatimly. 
 
 ```{r echo = FALSE}
 # load the packages, that are inconvinient to reference directly via namespace::
