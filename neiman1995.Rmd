@@ -409,11 +409,11 @@ renderPlot({
 
 #### Diversity *p.14-15* **(6)** **(7)**
 
-Estimating diversity within a population in these terms means that the population contains the same amount of diversity as would be found in an imaginary population with the effective number of variants at equal frequency.
+Instead of looking at homogeneity we can also estimate the diversity inside a population. One measure of diversity is the "effective number" of variants $n_e$, which is the reciprocal of $\hat{F}$. Estimating diversity within a population in these terms means that the population contains the same amount of diversity as would be found in an imaginary population with the effective number of variants at equal frequency. $n_e$ scales linearly with $θ$. Larger populations contain more diversity at a given level of innovation. Greater diversity is also expected in populations into which new variants are being introduced at higher rates. 
 
 $$n_e = 2 N_e μ + 1$$
 
-- $n_e$ = Effective number of variants
+- $n_e$: Effective number of variants
 
 ```{r echo=FALSE}
 ne <- function(theta) {
@@ -444,11 +444,11 @@ renderPlot({
 })
 ```
 
-Furthermore, it is clear that θ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population.
+Furthermore, it is clear that $θ$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population. We can call such estimates $t_F$, to distinguish them from the actual population values and to remind ourselves they are based on homogeneity $\hat{F}$ in Equation (5).
 
 $$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
 
-- $t_F$: Estimated θ by the sum of squares of variant frequencies
+- $t_F$: Estimated $θ$ by the sum of squares of variant frequencies
 
 ```{r echo=FALSE}
 theta_F <- function(amount_of_variants) {
