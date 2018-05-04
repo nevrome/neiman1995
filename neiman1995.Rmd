@@ -124,7 +124,7 @@ renderPlot({
 
 #### Homogeneity Under Drift *p.10-12* **(1)**
 
-The theory of neutral alleles allows to describe the within-population homogeneity $F$ as a function of the effective population size $N_e$. $F$ is the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant. In a given time period the probability of drawing an individual, who learned from the same model as some other randomly selected individual in the previous time period, is $1 / N$. The probability of the opposite is $1 - (1 / N)$. $F_{t - 1}$ is the probability that the model of the second individual learned from the same model as the model of the first indivudual in an earlier timestep. $F_t$ can be calculated by taking all this probabilities into consideration.  
+The theory of neutral alleles allows to describe the within-population homogeneity $F$ as a function of the effective population size $N_e$. $F$ is the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant. In a given time period the probability of drawing an individual, who learned from the same model as some other randomly selected individual in the previous time period, is $1 / N$. The probability of the opposite is $1 - (1 / N)$. $F_{t - 1}$ is the probability that the model of the second individual learned from the same model as the model of the first individual in an earlier timestep. $F_t$ can be calculated by taking all this probabilities into consideration.  
 
 $$F_t = \frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}$$
 
@@ -276,6 +276,8 @@ renderPlot({
 
 #### Homogeneity Under Drift and Innovation *p.14* **(2)** **(3)** **(4)** **(5)**
 
+Drift and innovation are opposing forces: drift increases homogeneity and innovation decreases it. This causes an equilibrium after some timesteps in the simulation. We can incorporate innovation into the calculation of $F$ by modifying equation (1). If innovation is possible, $F$ is not just defined as learning from yourself or learning from somebody else: there's also the possibility to create a new variant. 
+
 $$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
 
 ```{r echo=FALSE}
@@ -320,13 +322,17 @@ renderPlot({
 })
 ```
 
+The equilibrium is reached, when $F_t = F_{t-1}$. Setting $F_t = F_{t-1}$ in equation (2) defines $\hat{F}$.
+
 $$\hat{F} = \frac{(1 - μ)^2}{N_e} - (N_e - 1)(1 - μ)^2$$
+
+If we assume $μ$ is quite small we can further simplify this definition.
 
 $$\hat{F} \simeq \frac{1}{2 N_e μ + 1}$$
 
-- $θ$: $2*N_e*μ$ 
+That means the homogeneity of neutral variants within a population is inversely proportional to twice the effective population size times the innovation rate: $2*N_e*μ$. This expression will be called $θ$.
 
-The homogeneity of neutral variants within a population is inversely proportional to twice the effective population size times the innovation rate.
+- $θ$: $2*N_e*μ$ 
 
 ```{r echo=FALSE}
 theta <- function(Ne, mu) {
@@ -364,6 +370,8 @@ renderPlot({
     xlab("x * theta")
 })
 ```
+
+The homogeneity of a population can also be described as a function of the relative frequency of the variants in it: $p$. $p_i$ is the relative frequency of the $i$'th variant in the population, so $p$ is a vector of frequencies with the sum one. The probability of of choosing a given variant at random is its relative frequency $p_i$, which is also the probability of picking another copy of this same variant on the second try. The probability of getting this variant twice in a row is therefore $p_i^2$. The total probability of getting any of the $i = 1$ to $k$ variants twice in a row is the sum of all these probabilities.
 
 $$\hat{F} = \sum_{i=1}^{k} p^2_i$$
 
