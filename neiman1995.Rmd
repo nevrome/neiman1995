@@ -116,7 +116,7 @@ renderPlot({
       geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
       geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
       theme_bw() +
-      xlab("time / number of iterations") +
+      xlab(expression(paste("t"))) +
       ylab("variants and their occurence in the population [%]")
   
 })
@@ -165,10 +165,12 @@ renderPlot({
     Ft = Ft_time
   ) %>%
     ggplot() +
-    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_line(aes(t, Ft), size = 1) +
-    theme_bw()
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(t, Ft), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("t")) +
+      ylab(latex2exp::TeX("F_{t}"))
 })
 ```
 
@@ -269,7 +271,7 @@ renderPlot({
       geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
       geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
       theme_bw() +
-      xlab("time / number of iterations") +
+      xlab("t") +
       ylab("variants and their occurence in the population [%]")
 })
 ```
@@ -315,10 +317,12 @@ renderPlot({
     Ft = Ft_innovation_time
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_line(aes(t, Ft), size = 1) +
-    theme_bw()
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(t, Ft), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("t")) +
+      ylab(latex2exp::TeX("F_{t}"))
 })
 ```
 
@@ -332,7 +336,7 @@ $$\hat{F} \simeq \frac{1}{2 N_e μ + 1}$$
 
 That means the homogeneity of neutral variants within a population is inversely proportional to twice the effective population size times the innovation rate: $2*N_e*μ$. This expression will be called $θ$.
 
-- $θ$: $2*N_e*μ$ 
+- $θ$: Twice the effective population size times the innovation rate ($2 N_e μ$)
 
 ```{r echo=FALSE}
 theta <- function(Ne, mu) {
@@ -363,11 +367,12 @@ renderPlot({
     Fhat <- this_Fhat
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_line(aes(theta, Fhat), size = 1) +
-    theme_bw() +
-    xlab("x * theta")
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(theta, Fhat), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("θ")) +
+      ylab(latex2exp::TeX("\\hat{F}"))
 })
 ```
 
@@ -396,14 +401,16 @@ renderPlot({
     Fhat_mean = (Fhat_min + Fhat_max) / 2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_ribbon(
-      aes(x = amount_of_variants, ymin = Fhat_min, ymax = Fhat_max), 
-      fill = "deepskyblue", alpha = 0.5
-    ) +
-    geom_line(aes(x = amount_of_variants, y = Fhat_mean), color = "black", size = 1) +
-    theme_bw()
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_ribbon(
+        aes(x = amount_of_variants, ymin = Fhat_min, ymax = Fhat_max), 
+        fill = "deepskyblue", alpha = 0.5
+      ) +
+      geom_line(aes(x = amount_of_variants, y = Fhat_mean), color = "black", size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("k")) +
+      ylab(latex2exp::TeX("\\hat{F}"))
 })
 ```
 
@@ -437,10 +444,11 @@ renderPlot({
     ne = sapply(theta, function(x) {ne(x)})
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_line(aes(theta, ne), size = 1) +
-    theme_bw() +
-    xlab("x * theta")
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(theta, ne), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("θ")) +
+      ylab(latex2exp::TeX("n_e"))
 })
 ```
 
@@ -469,13 +477,15 @@ renderPlot({
     theta_F_mean = (theta_F_min + theta_F_max) / 2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_ribbon(
-      aes(x = amount_of_variants, ymin = theta_F_min, ymax = theta_F_max), 
-      fill = "deepskyblue", alpha = 0.5
-    ) +
-    geom_line(aes(x = amount_of_variants, y = theta_F_mean), size = 1) +
-    theme_bw()
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_ribbon(
+        aes(x = amount_of_variants, ymin = theta_F_min, ymax = theta_F_max), 
+        fill = "deepskyblue", alpha = 0.5
+      ) +
+      geom_line(aes(x = amount_of_variants, y = theta_F_mean), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("k")) +
+      ylab(latex2exp::TeX("t_F"))
 })
 ```
 
@@ -506,13 +516,15 @@ renderPlot({
     H_mean = (H_min + H_max) / 2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_ribbon(
-      aes(x = amount_of_variants, ymin = H_min, ymax = H_max), 
-      fill = "deepskyblue", alpha = 0.5
-    ) +
-    geom_line(aes(x = amount_of_variants, y = H_mean), color = "black", size = 1) +
-    theme_bw()
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_ribbon(
+        aes(x = amount_of_variants, ymin = H_min, ymax = H_max), 
+        fill = "deepskyblue", alpha = 0.5
+      ) +
+      geom_line(aes(x = amount_of_variants, y = H_mean), color = "black", size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("k")) +
+      ylab(latex2exp::TeX("H"))
 })
 ```
 
@@ -554,10 +566,11 @@ renderPlot({
     Ek = purrr::map2_dbl(n, theta, function(a, b) {Ek(a, b)})
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_line(aes(theta, Ek), size = 1) +
-    theme_bw() +
-    xlab("x * theta")
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(theta, Ek), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("θ")) +
+      ylab(latex2exp::TeX("E_k"))
 })
 ```
 
@@ -583,14 +596,16 @@ renderPlot({
     sed_mean = (sed_min + sed_max) / 2
   ) %>%
     ggplot() +    
-    geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_ribbon(
-      aes(x = amount_of_variants, ymin = sed_min, ymax = sed_max), 
-      fill = "deepskyblue", alpha = 0.5
-    ) +
-    geom_line(aes(x = amount_of_variants, y = sed_mean), color = "black", size = 1) +
-    theme_bw()
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_ribbon(
+        aes(x = amount_of_variants, ymin = sed_min, ymax = sed_max), 
+        fill = "deepskyblue", alpha = 0.5
+      ) +
+      geom_line(aes(x = amount_of_variants, y = sed_mean), color = "black", size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("k")) +
+      ylab(latex2exp::TeX("d_{ij}^2"))
 })
 ```
 
@@ -626,12 +641,12 @@ group_drift_simulation_data <- eventReactive(
 renderPlot({
   group_drift_simulation_data() %>%
     ggplot() +
-    geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
-    geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
-    theme_bw() +
-    xlab("time / number of iterations") +
-    ylab("variants and their occurence in the population [%]") +
-    facet_grid(group ~ .)
+      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+      theme_bw() +
+      xlab("t") +
+      ylab("variants and their occurence in the population [%]") +
+      facet_grid(group ~ .) 
 })
 ```
 
@@ -641,11 +656,13 @@ renderPlot({
     group_drift_simulation_data()
   ) %>%
     ggplot() +
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
-    geom_line(aes(x = t, y = sed), color = "black", size = 1, alpha = 0.3) +
-    geom_point(aes(x = t, y = sed), color = "black", size = 1) +
-    theme_bw()
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
+      geom_line(aes(x = t, y = sed), color = "black", size = 1, alpha = 0.3) +
+      geom_point(aes(x = t, y = sed), color = "black", size = 1) +
+      theme_bw()  +
+      xlab(latex2exp::TeX("t")) +
+      ylab(latex2exp::TeX("d_{ij}^2"))
 })
 ```
 
@@ -694,7 +711,9 @@ renderPlot({
     geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
     geom_line(aes(x = t, y = sed, group = sim_run), color = "black", size = 1, alpha = 0.3) +
     geom_point(aes(x = t, y = sed), color = "black", size = 1) +
-    theme_bw()
+    theme_bw() +
+    xlab(latex2exp::TeX("t")) +
+    ylab(latex2exp::TeX("d_{ij}^2"))
 })
 ```
 
@@ -851,7 +870,9 @@ renderPlot({
       aes(x = t, y = sed), 
       color = "dodgerblue4", size = 2
     ) +
-    theme_bw()
+    theme_bw() +
+    xlab(latex2exp::TeX("t")) +
+    ylab(latex2exp::TeX("d_{ij}^2"))
 })
 ```
 
