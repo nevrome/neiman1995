@@ -659,6 +659,8 @@ renderPlot({
 
 Equation (9) could be used to produce a maximum likelihood estimate of $θ$, that is the value of $θ$ that maximizes the chances of drawing the observed number of variants $k$ in a sample of the size $n$. Unfortunately it doesn't have an analytic solution, but we can still use it to estimate $θ$ iterativly by changing its value until $E(k)$ equals the observed number of variants. We call the result of doing so $t_E$. Both $t_E$ and $t_F$ offer us special statistical summaries of assemblage diversity, but there are theoretical reasons to prefer $t_E$ if $n$ and $k$ (and not just $p$) are known. 
 
+This applet allows to solve (9) for theta approximately. It starts at $θ = 10$, changes it in steps of $0.1$ and stops when $|E(k) - k| < 0.5$.
+
 ```{r echo=FALSE}
 inputPanel(
   sliderInput("n_iterative_theta", label = "n",
