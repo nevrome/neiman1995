@@ -659,6 +659,48 @@ renderPlot({
 
 Equation (9) could be used to produce a maximum likelihood estimate of $θ$, that is the value of $θ$ that maximizes the chances of drawing the observed number of variants $k$ in a sample of the size $n$. Unfortunately it doesn't have an analytic solution, but we can still use it to estimate $θ$ iterativly by changing its value until $E(k)$ equals the observed number of variants. We call the result of doing so $t_E$. Both $t_E$ and $t_F$ offer us special statistical summaries of assemblage diversity, but there are theoretical reasons to prefer $t_E$ if $n$ and $k$ (and not just $p$) are known. 
 
+```{r echo=FALSE}
+inputPanel(
+  sliderInput("n_iterative_theta", label = "n",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("k_iterative_theta", label = "k",
+               min = 5, max = 15, value = 10, step = 1),
+  actionButton("run_iterative_theta", "Approximate theta")
+)
+
+iterative_theta_data <- eventReactive(
+  input$run_iterative_theta, {
+  
+    # read input
+    n <- input$n_iterative_theta
+    k <- input$k_iterative_theta
+    start_theta <- 10
+    
+    # iterative solving loop
+    theta_iter <- start_theta
+    while (TRUE) {
+      diffi <- Ek(n, theta_iter) - k
+      if (diffi < 0) {
+        theta_iter <- theta_iter + 0.1
+      } else if (diffi > 0) {
+        theta_iter <- theta_iter - 0.1
+      }
+      if (abs(diffi) < 0.5) {
+        break;
+      }
+    }
+  
+    theta_iter
+  
+  },
+  ignoreNULL = FALSE
+)
+
+renderText({
+  paste0("theta ≈ ", round(iterative_theta_data(), 2))
+})
+```
+
 ### Drift, Intergroup Transmission, and Interassemblage Distance 
 
 #### Dynamics of Stylistic Distance between Two Groups *p.21-24* **(10)**
