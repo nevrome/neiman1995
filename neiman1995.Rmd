@@ -605,6 +605,10 @@ renderPlot({
 })
 ```
 
+To deal with the problem of sample-size dependency in the calculation of $t_F$ with equation (7), we have to consider that $θ$ also controls a characteristic probability distribution of variants. (7) shows how $θ$ is related to the sum of squared variant frequencies in a population, so it should be possible to predict for a given value of $θ$ how many variants occur with certain frequencies. When $θ$ is low ($θ \ll 1$), we should expect that most of the time , a population will be dominated by a few variants, with other variants at low frequencies. When $θ$ is high ($θ \gg 1$), we are more likely to see a large number of variants at low to moderate frequencies. 
+
+By combining this frequency distribution with the probability that a variant at a given frequency is represented at least once in a sample of a given size drawn at random from the population, it should be possible to deduce how many different variants we can expect to find in a sample of a given size. If the variants are selectively neutral, the expected number of different variants $k$ found in a sample drawn from a population is a function of the sample size $n$ and the $θ$. The number of variants will be larger when either $θ$ or $n$ are large.
+
 $$E(k) = \sum_{i = 0}^{n - 1} \frac{θ}{θ + i}$$
 
 - $E(k)$: Expected number of different variants
@@ -620,22 +624,24 @@ Ek <- function(n, theta) {
 }
 
 inputPanel(
-  sliderInput("Ne_5", label = "Ne",
+  sliderInput("Ne_expected_variants", label = "Ne",
                min = 10, max = 100, value = 20, step = 10),
-  sliderInput("mu_ewens", label = "μ",
+  sliderInput("mu_expected_variants", label = "μ",
                min = 0, max = 1, value = 0.01, step = 0.01),
-  sliderInput("n_ewens", label = "n",
+  sliderInput("n_expected_variants", label = "n",
                min = 0, max = 100, value = 10, step = 1)
 )
 
 renderText({
-  paste0("1 * theta = ", theta(input$Ne_5, input$mu_ewens))
+  paste0("1 * theta = ", theta(input$Ne_expected_variants, input$mu_expected_variants))
 })
 
 renderPlot({
-  Ne <- input$Ne_5
-  mu <- input$mu_ewens
-  n <- input$n_ewens
+  
+  # read input
+  Ne <- input$Ne_expected_variants
+  mu <- input$mu_expected_variants
+  n <- input$n_expected_variants
   
   tibble::tibble(
     theta = 0:100 * theta(Ne, mu),
@@ -647,7 +653,7 @@ renderPlot({
       geom_line(aes(theta, Ek), size = 1) +
       theme_bw() +
       xlab(latex2exp::TeX("θ")) +
-      ylab(latex2exp::TeX("E_k"))
+      ylab(latex2exp::TeX("E(k)"))
 })
 ```
 
