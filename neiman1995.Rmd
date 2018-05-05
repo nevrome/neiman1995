@@ -705,9 +705,15 @@ renderText({
 
 #### Archaeological Sample Size *p.16-17*
 
+$t_E$ may yield wrong estimates of $θ$ for very large archaeological samples that accumulated over long periods of time. Equation (9) implies that for a given number of variants $k$, $t_E$ will decline as the sample size $n$ increases. Usually $n$ is limited by the population size $N$, but in case of a long-term sample this limit can be exceeded: $n$ can grow beyond $N$ and causes the estimate of $θ$ to be too low. In this case $t_F$ can again be the better function to determine $θ$. Another solution is to look at the difference between both estimators ($t_F - t_E$) as a function of assemblage size.
+
 #### Inferences About Group Size and Innovation Rate *p.17-18*
 
-### Drift, Intergroup Transmission, and Interassemblage Distance 
+
+ 
+### Drift, Intergroup Transmission, and Interassemblage Distance
+
+
 
 #### Dynamics of Stylistic Distance between Two Groups *p.21-24* **(10)**
 
