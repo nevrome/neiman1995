@@ -657,6 +657,8 @@ renderPlot({
 })
 ```
 
+Equation (9) could be used to produce a maximum likelihood estimate of $θ$, that is the value of $θ$ that maximizes the chances of drawing the observed number of variants $k$ in a sample of the size $n$. Unfortunately it doesn't have an analytic solution, but we can still use it to estimate $θ$ iterativly by changing its value until $E(k)$ equals the observed number of variants. We call the result of doing so $t_E$. Both $t_E$ and $t_F$ offer us special statistical summaries of assemblage diversity, but there are theoretical reasons to prefer $t_E$ if $n$ and $k$ (and not just $p$) are known. 
+
 ### Drift, Intergroup Transmission, and Interassemblage Distance 
 
 #### Dynamics of Stylistic Distance between Two Groups *p.21-24* **(10)**
