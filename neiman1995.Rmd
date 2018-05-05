@@ -703,6 +703,10 @@ renderText({
 })
 ```
 
+#### Archaeological Sample Size *p.16-17*
+
+#### Inferences About Group Size and Innovation Rate *p.17-18*
+
 ### Drift, Intergroup Transmission, and Interassemblage Distance 
 
 #### Dynamics of Stylistic Distance between Two Groups *p.21-24* **(10)**
