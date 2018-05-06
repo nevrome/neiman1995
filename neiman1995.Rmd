@@ -833,7 +833,7 @@ renderPlot({
 })
 ```
 
-We can run the above simulation many times to see different results random drift can produce. 
+We can run the above simulation many times to see different results random drift can produce. At the beginning the distance between the groups is always zero, because the variants and variant frequencies are equal in both. However, as time passes, the distance increases up to a quasi-stationary equilibrium. The equilibrium is only quasi-stationary because the groups are finite and there is no innovation: if the simulations are continued for a sufficient number of time periods, a single variant is fixed and as a result the between-group distance reverts to zero. The equilibrium holds over the period during which the opposing forces of drift, locally reducing variation within each group, and intergroup transmission, introducing potentially novel variation into each group from the other, are balanced. Later drift globally depletes all variation in both groups.
 
 ```{r echo=FALSE}
 inputPanel(
