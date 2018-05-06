@@ -754,7 +754,6 @@ sed_general_data <- eventReactive(
 renderPlot({
   sed_general_data() %>%
     ggplot() +    
-      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
       geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
       geom_ribbon(
         aes(x = amount_of_variants, ymin = sed_min, ymax = sed_max), 
@@ -804,20 +803,17 @@ group_drift_simulation_data <- eventReactive(
 )
 
 renderPlot({
-  group_drift_simulation_data() %>%
+  A <- group_drift_simulation_data() %>%
     ggplot() +
       geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
       geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
       theme_bw() +
       xlab("t") +
       ylab("variants and their occurence in the population [%]") +
-      facet_grid(group ~ .) 
-})
-```
-
-```{r echo=FALSE}
-renderPlot({
-  calculate_sed_for_group_drift_simulation_result(
+      facet_grid(group ~ .)
+  
+  
+  B <- calculate_sed_for_group_drift_simulation_result(
     group_drift_simulation_data()
   ) %>%
     ggplot() +
@@ -828,6 +824,8 @@ renderPlot({
       theme_bw()  +
       xlab(latex2exp::TeX("t")) +
       ylab(latex2exp::TeX("d_{ij}^2"))
+  
+  cowplot::plot_grid(A, B, nrow = 2, align = "v", axis = "lr")
 })
 ```
 
