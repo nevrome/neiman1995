@@ -767,31 +767,38 @@ renderPlot({
 })
 ```
 
-Simulation
+The study of intergroup cultural transmission requires a model setup that contains the effect of drift but also exchange between groups. One promising approach comes from migration matrix models, which in population genetics have proven useful in studying the effects of drift and intergroup genetic transmission on genetic distances among small, localized demes. Such models reveal what happends to variant frequencies in a finite number of demes that are subject to the joint effects of drift, whose strength is controlled by the effective size of each population, and intergroup transmission, ocurring between demes at constant pairwise rates. There is no role role in these models for in situ innovation, but they offer a means of checking the assumption that variation in $θ$ is largely a function of intergroup transmission. 
+
+The following simulation is constructed like the very first one about the effects of drift. Only in this case, there is a set probability, the intergroup transmission rate $m_i$, that the individual contacted is derived from the other group. If $m_i = 0$, both groups act independently, but if it increases they tend to develop roughly alike.
+
+The line chart below the variant frequency area plot shows the distance measure $d_{ij}^2$ calculated for the two groups at the respective point in model time.
 
 $m_i$: intergroup transmission rate
 
 ```{r echo=FALSE}
 inputPanel(
-  sliderInput("k_group", label = "k",
+  sliderInput("k_two_groups", label = "k",
                min = 5, max = 15, value = 10, step = 1),
-  sliderInput("N_group", label = "N",
+  sliderInput("N_two_groups", label = "N",
                min = 10, max = 100, value = 20, step = 10),
-  sliderInput("t_final_group", label = "t",
+  sliderInput("t_two_groups", label = "t",
                min = 50, max = 200, value = 100, step = 50),
-  sliderInput("mi", label = "mi",
+  sliderInput("mi_two_groups", label = "mi",
                min = 0, max = 1, value = 0.1, step = 0.01),
-  actionButton("run_button_group_drift_simulation", "Run simulation")
+  actionButton("run_button_two_groups", "Run simulation")
 )
 
 group_drift_simulation_data <- eventReactive(
   input$run_button_group_drift_simulation, {
+    
+    # run simulation (code in source file)
     group_drift_simulation(
-      input$k_group, 
-      input$N_group, 
-      input$t_final_group, 
-      input$mi
+      input$k_two_groups, 
+      input$N_two_groups, 
+      input$t_two_groups, 
+      input$mi_two_groups
     )
+    
   },
   ignoreNULL = FALSE
 )
