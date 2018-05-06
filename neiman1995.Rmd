@@ -835,6 +835,8 @@ renderPlot({
 
 We can run the above simulation many times to see different results random drift can produce. At the beginning the distance between the groups is always zero, because the variants and variant frequencies are equal in both. However, as time passes, the distance increases up to a quasi-stationary equilibrium. The equilibrium is only quasi-stationary because the groups are finite and there is no innovation: if the simulations are continued for a sufficient number of time periods, a single variant is fixed and as a result the between-group distance reverts to zero. The equilibrium holds over the period during which the opposing forces of drift, locally reducing variation within each group, and intergroup transmission, introducing potentially novel variation into each group from the other, are balanced. Later drift globally depletes all variation in both groups.
 
+Higher levels of intergroup transmission $m_i$ will lower the equilibrium level, while lower levels of intergroup transmission raise it. Lower effective sizes $N$ for either or both groups will raise the equilibrium since the effects of drift scale with $N$. The speed with which the equilibrium is achieved depends heavily on the modes of transmission. Horizontal transmission can cause rather fast changes, while vertical and oblique transmission may take centuries. The equilibrium is also approached in case of initially divergent groups with different variants and variant frequencies if there is intergroup transmission among them ($m_i > 0$).
+
 ```{r echo=FALSE}
 inputPanel(
   sliderInput("k_two_groups_many_runs", label = "k",
