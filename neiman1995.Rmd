@@ -805,13 +805,17 @@ group_drift_simulation_data <- eventReactive(
 renderPlot({
   A <- group_drift_simulation_data() %>%
     ggplot() +
-      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
-      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+      geom_area(
+        aes(x = time, y = individuals_with_variant, fill = variant, group = variant)
+      ) +
+      geom_line(
+        aes(x = time, y = individuals_with_variant, group = variant), 
+        position = "stack"
+      ) +
       theme_bw() +
       xlab("t") +
       ylab("variants and their occurence in the population [%]") +
       facet_grid(group ~ .)
-  
   
   B <- calculate_sed_for_group_drift_simulation_result(
     group_drift_simulation_data()
@@ -829,26 +833,27 @@ renderPlot({
 })
 ```
 
-Many simulation runs
+We can run the above simulation many times to see different results random drift can produce. 
 
 ```{r echo=FALSE}
 inputPanel(
-  sliderInput("k_group_2", label = "k",
+  sliderInput("k_two_groups_many_runs", label = "k",
                min = 5, max = 15, value = 10, step = 1),
-  sliderInput("N_group_2", label = "N",
+  sliderInput("N__two_groups_many_runs", label = "N",
                min = 10, max = 100, value = 20, step = 10),
-  sliderInput("t_final_group_2", label = "t",
+  sliderInput("t_two_groups_many_runs", label = "t",
                min = 20, max = 200, value = 20, step = 20),
-  sliderInput("mi_2", label = "mi",
+  sliderInput("mi_two_groups_many_runs", label = "mi",
                min = 0, max = 1, value = 0.1, step = 0.01),
-  sliderInput("sim_runs", label = "Number of simulation runs",
+  sliderInput("sim_runs_two_groups_many_runs", label = "Number of simulation runs",
                min = 1, max = 100, value = 20, step = 1),
-  actionButton("run_button_group_drift_simulation_iter", "Run simulation")
+  actionButton("run_button_two_groups_many_runs", "Run simulation")
 )
 
-group_drift_simulation_data_2 <- eventReactive(
-  input$run_button_group_drift_simulation_iter, {
+two_groups_many_runs_data <- eventReactive(
+  input$run_button_two_groups_many_runs, {
     
+    # run the simulation many times and store results in res_list
     res_list <- list()
     for (i in 1:input$sim_runs) {
       res_list[[i]] <- calculate_sed_for_group_drift_simulation_result(
@@ -862,21 +867,23 @@ group_drift_simulation_data_2 <- eventReactive(
       ) 
     }
     
+    # rbind individual simulation results into one data.frame
     do.call(rbind, res_list)
+    
   },
   ignoreNULL = FALSE
 )
 
 renderPlot({
-  group_drift_simulation_data_2() %>%
-  ggplot() +
-    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-    geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
-    geom_line(aes(x = t, y = sed, group = sim_run), color = "black", size = 1, alpha = 0.3) +
-    geom_point(aes(x = t, y = sed), color = "black", size = 1) +
-    theme_bw() +
-    xlab(latex2exp::TeX("t")) +
-    ylab(latex2exp::TeX("d_{ij}^2"))
+  two_groups_many_runs_data() %>%
+    ggplot() +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
+      geom_line(aes(x = t, y = sed, group = sim_run), color = "black", size = 1, alpha = 0.3) +
+      geom_point(aes(x = t, y = sed), color = "black", size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("t")) +
+      ylab(latex2exp::TeX("d_{ij}^2"))
 })
 ```
 
