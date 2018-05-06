@@ -841,7 +841,7 @@ Higher levels of intergroup transmission $m_i$ will lower the equilibrium level,
 inputPanel(
   sliderInput("k_two_groups_many_runs", label = "k",
                min = 5, max = 15, value = 10, step = 1),
-  sliderInput("N__two_groups_many_runs", label = "N",
+  sliderInput("N_two_groups_many_runs", label = "N",
                min = 10, max = 100, value = 20, step = 10),
   sliderInput("t_two_groups_many_runs", label = "t",
                min = 20, max = 200, value = 20, step = 20),
@@ -857,13 +857,13 @@ two_groups_many_runs_data <- eventReactive(
     
     # run the simulation many times and store results in res_list
     res_list <- list()
-    for (i in 1:input$sim_runs) {
+    for (i in 1:input$sim_runs_two_groups_many_runs) {
       res_list[[i]] <- calculate_sed_for_group_drift_simulation_result(
         group_drift_simulation(
-          input$k_group_2, 
-          input$N_group_2, 
-          input$t_final_group_2, 
-          input$mi_2
+          input$k_two_groups_many_runs, 
+          input$N_two_groups_many_runs, 
+          input$t_two_groups_many_runs, 
+          input$mi_two_groups_many_runs
         ),
         sim_run = i
       ) 
