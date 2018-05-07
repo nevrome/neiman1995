@@ -891,6 +891,10 @@ renderPlot({
 
 #### Stylistic Distances for Multiple Groups *p.24-25* **(11)** **(12)**
 
+The real world is better represented in terms of more than two groups learning from another. The multi-group case can be despribed in a matrix based model. The matrix $\mathbf{M}$ contains the intergroup transmission rates $m_{ij}$ that give the proportion of the $i$'th deme that learned from the $j$'th deme. The diagonal elements of $\mathbf{M}$ are the proportion of each deme that learned from its own members. The matrix $\mathbf{U}$ contains the reciprocals of the effective population sizes $1 / N_e$ of each group on its diagonal and 0's elsewhere. 
+
+In this setup all groups initially have the same variant frequencies. This means that the expected frequencies for each group in any time period are identical and equal to the starting frequency. Drift-driven departures from this expectation for a given deme can be characterized analytically in terms of variance. Since there are multiple demes in the system, their joint evolution must be handled in terms of a matrix of variances and covariances: $\mathbf{V}^{(t)}$. Diagonal elements in $\mathbf{V}^{(t)}$ contain variances: the square of the departure of the variant frequency in the respective deme at time $t$ from the situation at the starting time. The other elements are covariances: the product of the departures of the variant frequencies in each pair of demes. 
+
 $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
 
 - $\mathbf{M}$: Matrix of intergroup transmission rates
@@ -901,8 +905,8 @@ $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^
 
 $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
 
-- $v_{ii}^{(t)}$: Diagonal element of $\mathbf{V}^{(t)}$ -- a variance. The square of of the departure of the variant frequency in the $i$'th deme at time $t$ from its starting frequency when the demes were identical, standardized by the variance of that starting frequency.
-- $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes i and j, again standardized by the variance of the starting frequency. 
+- $v_{ii}^{(t)}$: Diagonal element of $\mathbf{V}^{(t)}$ -- a variance. The square of of the departure of the variant frequency in the $i$'th deme at time $t$ from its starting frequency when the demes were identical, standardized by the variance of that starting frequency
+- $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes i and j, again standardized by the variance of the starting frequency
 
 ### Woodland Interassemblage Distance
 
