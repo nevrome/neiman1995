@@ -36,12 +36,12 @@ purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 
 #### Temporal Dynamics of Drift *p.10*
 
-Minimal simulation of drift in a population of $N$ individuals with $k$ variants over $t$ timesteps. Drift is sampling error that accompanies all forms of cultural transmission and causes individual variants to vanish or dominate randomly. It causes one variant to dominate and eradicate all the others. The speed with which the variation is destroyed increases as the population size decreases.  
+Minimal simulation of drift in a population of $N$ individuals with $k$ variants over $t$ time steps. Drift is sampling error that accompanies all forms of cultural transmission and causes individual variants to vanish or dominate randomly. It causes one variant to dominate and eradicate all the others. The speed with which the variation is destroyed increases as the population size decreases.  
 
-Mechanics of the simulation: In each timestep every individual randomly adopts a variant from somebody else. The probability of getting somebody elses variant is $(N - 1) / N$ while the probability of keeping the own variant is only $1 / N$. 
+Mechanics of the simulation: In each time step every individual randomly adopts a variant from somebody else. The probability of getting somebody else's variant is $(N - 1) / N$ while the probability of keeping the own variant is only $1 / N$. 
 
 - $k$: Amount of variants in a population
-- $N_e$: Size of the effective population. The effective population consists of the individuals within a population that is activly involved in a cultural transmission process
+- $N_e$: Size of the effective population. The effective population consists of the individuals within a population that is actively involved in a cultural transmission process
 - $t$: Time / number of iterations
 
 ```{r echo=FALSE}
@@ -126,14 +126,14 @@ renderPlot({
 
 #### Homogeneity Under Drift *p.10-12* **(1)**
 
-The theory of neutral alleles allows to describe the within-population homogeneity $F$ as a function of the effective population size $N_e$. $F$ is the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant. In a given time period the probability of drawing an individual, who learned from the same model as some other randomly selected individual in the previous time period, is $1 / N$. The probability of the opposite is $1 - (1 / N)$. $F_{t - 1}$ is the probability that the model of the second individual learned from the same model as the model of the first individual in an earlier timestep. $F_t$ can be calculated by taking all this probabilities into consideration.  
+The theory of neutral alleles allows to describe the within-population homogeneity $F$ as a function of the effective population size $N_e$. $F$ is the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant. In a given time period the probability of drawing an individual, who learned from the same model as some other randomly selected individual in the previous time period, is $1 / N$. The probability of the opposite is $1 - (1 / N)$. $F_{t - 1}$ is the probability that the model of the second individual learned from the same model as the model of the first individual in an earlier time step. $F_t$ can be calculated by taking all this probabilities into consideration.  
 
 $$F_t = \frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}$$
 
 As an effect of drift, $F_t$ approaches one as $t$ increases.
 
-- $F_t$: Within-population homogeneity. That's the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant at a certain timestep
-- $F_{t - 1}$: Probability that the model of the second individual learned from the same model as the model of the first indivudual in an earlier timestep
+- $F_t$: Within-population homogeneity. That's the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant at a certain time step
+- $F_{t - 1}$: Probability that the model of the second individual learned from the same model as the model of the first individual in an earlier time step
 
 ```{r echo=FALSE}
 Ft <- function(F0, Ne, time) {
@@ -180,7 +180,7 @@ renderPlot({
 
 Simulation built on the first simple drift simulation. Here the concept of innovation is added: Individuals can not just inherit but also create new variants with the probability $μ$. In this context $k$ is just the initial number of variants at $t = 0$. The effect of drift is still strongly visible, but with increasing $μ$ it becomes less relevant. New variants can form and replace the dominant one. 
 
-Mechanics of the simulation: The simulation works like the first one, but now there's a chance of $μ$ for every indivual in every timestep to create a new variant.
+Mechanics of the simulation: The simulation works like the first one, but now there's a chance of $μ$ for every individual in every time step to create a new variant.
 
 - $μ$: Innovation rate. Probability of the creation of a new variant
 
@@ -280,7 +280,7 @@ renderPlot({
 
 #### Homogeneity Under Drift and Innovation *p.14* **(2)** **(3)** **(4)** **(5)**
 
-Drift and innovation are opposing forces: drift increases homogeneity and innovation decreases it. This causes an equilibrium after some timesteps in the simulation. We can incorporate innovation into the calculation of $F$ by modifying equation (1). If innovation is possible, $F$ is not just defined as learning from yourself or learning from somebody else: there's also the possibility to create a new variant. 
+Drift and innovation are opposing forces: drift increases homogeneity and innovation decreases it. This causes an equilibrium after some time steps in the simulation. We can incorporate innovation into the calculation of $F$ by modifying equation (1). If innovation is possible, $F$ is not just defined as learning from yourself or learning from somebody else: there's also the possibility to create a new variant. 
 
 $$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
 
@@ -384,7 +384,7 @@ For this plot $p$ is randomly drawn some hundred times from a uniform distributi
 
 $$\hat{F} = \sum_{i=1}^{k} p^2_i$$
 
-- $p_i$: relative frequency of the i'th variant in the population 
+- $p_i$: relative frequency of the $i$'th variant in the population 
 
 ```{r echo=FALSE}
 Fhat_relative_frequency <- function(amount_of_variants) {
@@ -548,7 +548,7 @@ renderPlot({
 
 #### Diversity and Sample Size *p.15-16* **(8)** **(9)**
 
-One problem of the set of equations so far is that the frequency of variants in a population of social learners is not equal to the frequency preserved and documented in the archaeological assemblage. Under appropriate taphonomic circumstances, however, they are surprisingly similar. Another problem arises because we try to estimate diversity only on the basis of a sample derived from a population. The equations (5) and (7) are similar to the Shannon-Weaver information statistic, which is very senstitive to sample-size variation.
+One problem of the set of equations so far is that the frequency of variants in a population of social learners is not equal to the frequency preserved and documented in the archaeological assemblage. Under appropriate taphonomic circumstances, however, they are surprisingly similar. Another problem arises because we try to estimate diversity only on the basis of a sample derived from a population. The equations (5) and (7) are similar to the Shannon-Weaver information statistic, which is very sensitive to sample-size variation.
 
 $$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
 
@@ -659,7 +659,7 @@ renderPlot({
 })
 ```
 
-Equation (9) could be used to produce a maximum likelihood estimate of $θ$, that is the value of $θ$ that maximizes the chances of drawing the observed number of variants $k$ in a sample of the size $n$. Unfortunately it doesn't have an analytic solution, but we can still use it to estimate $θ$ iterativly by changing its value until $E(k)$ equals the observed number of variants. We call the result of doing so $t_E$. Both $t_E$ and $t_F$ offer us special statistical summaries of assemblage diversity, but there are theoretical reasons to prefer $t_E$ if $n$ and $k$ (and not just $p$) are known. 
+Equation (9) could be used to produce a maximum likelihood estimate of $θ$, that is the value of $θ$ that maximizes the chances of drawing the observed number of variants $k$ in a sample of the size $n$. Unfortunately it doesn't have an analytic solution, but we can still use it to estimate $θ$ iteratively by changing its value until $E(k)$ equals the observed number of variants. We call the result of doing so $t_E$. Both $t_E$ and $t_F$ offer us special statistical summaries of assemblage diversity, but there are theoretical reasons to prefer $t_E$ if $n$ and $k$ (and not just $p$) are known. 
 
 This applet allows to solve (9) for theta approximately. It starts at $θ = 10$, changes it in steps of $0.1$ and stops when $|E(k) - k| < 0.5$.
 
@@ -711,17 +711,17 @@ $t_E$ may yield wrong estimates of $θ$ for very large archaeological samples th
 
 #### Inferences About Group Size and Innovation Rate *p.17-18*
 
-$θ$ is defined as twice the effective population size times the innovation rate ($2 N_e μ$). The innovation rate $μ$ includes the combined effects of both in situ innovation $v$ and the introduction of novel variants from other groups $m$. If $μ = v + m$, then $N_e μ = N_e v + N_e m$. $v$ should be roughly constant across demes, but $m$ is likely to be more variable in time and space. Under these circumstances, most of the variation in $θ$ associated with $μ$ will be caused by variation in intergroup transmission rates. $θ$ mostly depends on the numver of times local group members learn from members of other groups: $N_e m$. That means that variation in $θ$ is an indicator for the absolute amount of cultural transmission among demes in a geographical region. 
+$θ$ is defined as twice the effective population size times the innovation rate ($2 N_e μ$). The innovation rate $μ$ includes the combined effects of both in situ innovation $v$ and the introduction of novel variants from other groups $m$. If $μ = v + m$, then $N_e μ = N_e v + N_e m$. $v$ should be roughly constant across demes, but $m$ is likely to be more variable in time and space. Under these circumstances, most of the variation in $θ$ associated with $μ$ will be caused by variation in intergroup transmission rates. $θ$ mostly depends on the number of times local group members learn from members of other groups: $N_e m$. That means that variation in $θ$ is an indicator for the absolute amount of cultural transmission among demes in a geographical region. 
  
 ### Drift, Intergroup Transmission, and Interassemblage Distance
 
 #### Dynamics of Stylistic Distance between Two Groups *p.21-24* **(10)**
 
-To compare groups and track the cultural transmission we need a simple measure of between-group similarity. One possibility is to look at the squared Euclidian distance $d_{ij}^2$. It's the sum of squared differences in variant frequencies $p$ between two groups $i$ and $j$.  
+To compare groups and track the cultural transmission we need a simple measure of between-group similarity. One possibility is to look at the squared Euclidean distance $d_{ij}^2$. It's the sum of squared differences in variant frequencies $p$ between two groups $i$ and $j$.  
 
 $$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
 
-- $d_{ij}^2$: Squared Euclidian distance between two groups
+- $d_{ij}^2$: Squared Euclidean distance between two groups
 - $n$: total amount of variants (here not sample size)
 
 ```{r echo=FALSE}
@@ -768,7 +768,7 @@ renderPlot({
 })
 ```
 
-The study of intergroup cultural transmission requires a model setup that contains the effect of drift but also exchange between groups. One promising approach comes from migration matrix models, which in population genetics have proven useful in studying the effects of drift and intergroup genetic transmission on genetic distances among small, localized demes. Such models reveal what happends to variant frequencies in a finite number of demes that are subject to the joint effects of drift, whose strength is controlled by the effective size of each population, and intergroup transmission, ocurring between demes at constant pairwise rates. There is no role role in these models for in situ innovation, but they offer a means of checking the assumption that variation in $θ$ is largely a function of intergroup transmission. 
+The study of intergroup cultural transmission requires a model setup that contains the effect of drift but also exchange between groups. One promising approach comes from migration matrix models, which in population genetics have proven useful in studying the effects of drift and intergroup genetic transmission on genetic distances among small, localized demes. Such models reveal what happens to variant frequencies in a finite number of demes that are subject to the joint effects of drift, whose strength is controlled by the effective size of each population, and intergroup transmission, occurring between demes at constant pairwise rates. There is no role role in these models for in situ innovation, but they offer a means of checking the assumption that variation in $θ$ is largely a function of intergroup transmission. 
 
 The following simulation is constructed like the very first one about the effects of drift. Only in this case, there is a set probability, the intergroup transmission rate $m_i$, that the individual contacted is derived from the other group. If $m_i = 0$, both groups act independently, but if it increases they tend to develop roughly alike.
 
@@ -893,7 +893,7 @@ renderPlot({
 
 #### Stylistic Distances for Multiple Groups *p.24-25* **(11)** **(12)**
 
-The real world is better represented in terms of more than two groups learning from another. The multi-group case can be despribed in a matrix based model. The visualization for this model can be found in the next segment "Diversity and Distance for Individual Assemblages". 
+The real world is better represented in terms of more than two groups learning from another. The multi-group case can be described in a matrix based model. The visualization for this model can be found in the next segment "Diversity and Distance for Individual Assemblages". 
 
 The matrix $\mathbf{M}$ contains the intergroup transmission rates $m_{ij}$ that give the proportion of the $i$'th deme that learned from the $j$'th deme. The diagonal elements of $\mathbf{M}$ are the proportion of each deme that learned from its own members. The matrix $\mathbf{U}$ contains the reciprocals of the effective population sizes $1 / N_e$ of each group on its diagonal and 0's elsewhere. 
 
@@ -905,18 +905,18 @@ $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^
 - $\mathbf{V}^{(t)}$: Matrix of variances and covariances
 - $r$: Index of the successive time periods
 - $\mathbf{U}$ Matrix of reciprocals of the effective population sizes ($1 / N_e$). These are on the diagonal, the rest is 0.
-- $(\mathbf{M}^r)^{\prime}$: M transponiert
+- $(\mathbf{M}^r)^{\prime}$: M transposed
 
 Equation 11 says that in the first time period, the covariance between two groups is a function of the sum of products of the intergroup transmission rates from all groups to those two groups and the reciprocal of their two effective population sizes. In later time periods, as individuals who learned from non-group members are in turn distributed among the other groups, the intergroup transmission rates from each group to *all* the others assumes increasing importance. The resulting cumulative effect of the indirect movement of variants among groups is handled by successively powering the intergroup transmission matrix.
 
 The magnitude of the covariance between two groups will scale inversely with their sizes $N$ and positively with the intergroup transmission rates $m$. High levels of intergroup transmission will mean that whatever departures from the initial frequency occur, they will be similar and in the same direction, hence the covariance between the groups will be high. On the other hand, if either or both group sizes are low, causing drift to play a stronger role, variant frequencies are less likely to depart from initial frequencies in a similar fashion. The covariances will be low.
 
-The matrix of variances and covariances $\mathbf{V}$ can be converted to a matrix of squared Euclidian distances $d_{ij}^{2}$ (or $\mathbf{SED}$).
+The matrix of variances and covariances $\mathbf{V}$ can be converted to a matrix of squared Euclidean distances $d_{ij}^{2}$ (or $\mathbf{SED}$).
 
 $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
 
 - $v_{ii}^{(t)}$: Diagonal element of $\mathbf{V}^{(t)}$ -- a variance. The square of of the departure of the variant frequency in the $i$'th deme at time $t$ from its starting frequency when the demes were identical, standardized by the variance of that starting frequency
-- $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes i and j, again standardized by the variance of the starting frequency
+- $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes $i$ and $j$, again standardized by the variance of the starting frequency
 
 ```{r echo = FALSE}
 inputPanel(
