@@ -918,12 +918,6 @@ $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
 - $v_{ii}^{(t)}$: Diagonal element of $\mathbf{V}^{(t)}$ -- a variance. The square of of the departure of the variant frequency in the $i$'th deme at time $t$ from its starting frequency when the demes were identical, standardized by the variance of that starting frequency
 - $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes i and j, again standardized by the variance of the starting frequency
 
-### Woodland Interassemblage Distance
-
-#### Diversity and Distance for Individual Assemblages *p.26-27* **(13)**
-
-$$\bar{d}_{i}^{2} = \sum_{j = 1}^{n} d_{ij}^{2} / (n - 1), i \neq j$$
-
 ```{r echo = FALSE}
 inputPanel(
   sliderInput("Ne_matrix", label = "Ne",
@@ -971,6 +965,18 @@ renderPlot({
 height = 1200
 )
 ``` 
+
+### Woodland Interassemblage Distance
+
+#### Trends in Interassemblage Distance *p.25-26* 
+
+The migration matrix approach can be applied to the problem of woodland ceramic diversity by computing a matrix of squared Euclidian distances between the groups for each of the variants. We expect to find that the overall level of differentiation among groups, as measured by the mean of the squared Euclidian distances, is the mirror image of our estimates of $θ$.
+
+#### Diversity and Distance for Individual Assemblages *p.26-27* **(13)**
+
+
+
+$$\bar{d}_{i}^{2} = \sum_{j = 1}^{n} d_{ij}^{2} / (n - 1), i \neq j$$
 
 Simulation with matrix calculation results
 
