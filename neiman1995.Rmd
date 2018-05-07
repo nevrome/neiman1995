@@ -911,7 +911,7 @@ Equation 11 says that in the first time period, the covariance between two group
 
 The magnitude of the covariance between two groups will scale inversely with their sizes $N$ and positively with the intergroup transmission rates $m$. High levels of intergroup transmission will mean that whatever departures from the initial frequency occur, they will be similar and in the same direction, hence the covariance between the groups will be high. On the other hand, if either or both group sizes are low, causing drift to play a stronger role, variant frequencies are less likely to depart from initial frequencies in a similar fashion. The covariances will be low.
 
-The matrix of variances and covariances $\mathbf{V}$ can be converted to a matrix of squared Euclidian distances $d_{ij}^{2}$.
+The matrix of variances and covariances $\mathbf{V}$ can be converted to a matrix of squared Euclidian distances $d_{ij}^{2}$ (or $\mathbf{SED}$).
 
 $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
 
@@ -970,15 +970,13 @@ height = 1200
 
 #### Trends in Interassemblage Distance *p.25-26* 
 
-The migration matrix approach can be applied to the problem of woodland ceramic diversity by computing a matrix of squared Euclidian distances between the groups for each of the variants. We expect to find that the overall level of differentiation among groups, as measured by the mean of the squared Euclidian distances, is the mirror image of our estimates of $θ$.
+The migration matrix approach can be applied to cultural transmission contexts by computing a matrix of squared Euclidian distances $\mathbf{SED}$ between the groups for each of the variants. We expect to find that the overall level of differentiation among groups, as measured by the mean of the squared Euclidian distances $\mathbf{MSD}$, is the mirror image of our estimates of $θ$.
 
 #### Diversity and Distance for Individual Assemblages *p.26-27* **(13)**
 
-
+The mean of the squared Euclidian distance $\bar{d}_{i}^{2}$ (or $MSD$) kann be calculated with (13). 
 
 $$\bar{d}_{i}^{2} = \sum_{j = 1}^{n} d_{ij}^{2} / (n - 1), i \neq j$$
-
-Simulation with matrix calculation results
 
 ```{r echo = FALSE}
 inputPanel(
