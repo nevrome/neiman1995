@@ -36,7 +36,7 @@ purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 
 #### Temporal Dynamics of Drift *p.10*
 
-Minimal simulation of drift in a population of $N$ individuals with $k$ variants over $t$ time steps. Drift is sampling error that accompanies all forms of cultural transmission and causes individual variants to vanish or dominate randomly. It causes one variant to dominate and eradicate all the others. The speed with which the variation is destroyed increases as the population size decreases.  
+The first simulation shows the effect of drift in a population of $N$ individuals with $k$ variants over $t$ time steps. Drift is sampling error that accompanies all forms of cultural transmission and causes individual variants to vanish or dominate randomly. In the end one variant usually eradicates all the others. The speed with which the variation is destroyed increases as the population size decreases.  
 
 Mechanics of the simulation: In each time step every individual randomly adopts a variant from somebody else. The probability of getting somebody else's variant is $(N - 1) / N$ while the probability of keeping the own variant is only $1 / N$. 
 
@@ -178,7 +178,7 @@ renderPlot({
 
 #### Temporal Dynamics of Drift and Innovation *p.12-14*
 
-Simulation built on the first simple drift simulation. Here the concept of innovation is added: Individuals can not just inherit but also create new variants with the probability $μ$. In this context $k$ is just the initial number of variants at $t = 0$. The effect of drift is still strongly visible, but with increasing $μ$ it becomes less relevant. New variants can form and replace the dominant one. 
+The following simulation is built upon the first simple drift simulation. Here the concept of innovation is added: Individuals can not just inherit but also create new variants with the probability $μ$. In this context $k$ is just the initial number of variants at $t = 0$. The effect of drift is still strongly visible, but with increasing $μ$ it becomes less relevant. New variants can form and replace the dominant one. 
 
 Mechanics of the simulation: The simulation works like the first one, but now there's a chance of $μ$ for every individual in every time step to create a new variant.
 
@@ -396,7 +396,7 @@ Fhat_relative_frequency <- function(amount_of_variants) {
 inputPanel(
   sliderInput("k_relative_frequency", label = "k",
                min = 50, max = 150, value = 100, step = 10),
-  sliderInput("number_of_replications_relative_frequency", label = "Number of random creations of p",
+  sliderInput("number_of_replications_relative_frequency", label = "Number of simulation runs",
                min = 100, max = 1000, value = 500, step = 100),
   actionButton("run_button_relative_frequency", "Run simulation")
 )
@@ -483,9 +483,9 @@ renderPlot({
 })
 ```
 
-Furthermore, it is clear that $θ$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population. We can call such estimates $t_F$, to distinguish them from the actual population values and to remind ourselves they are based on homogeneity $\hat{F}$ in Equation (5). With this equation we can get useful insights into variations in $θ$ among groups or demes.
+Furthermore, it is clear that $θ$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population. We can call such estimates $t_F$, to distinguish them from the actual population values and to remind ourselves that they are based on the homogeneity $\hat{F}$ in Equation (5). With this equation we can get useful insights into variations in $θ$ among groups or demes.
 
-For this plot $p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $t_F$ the ribbon the min and max results.
+For this plot $p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $t_F$, the ribbon the min and max results.
 
 $$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
 
@@ -501,7 +501,7 @@ theta_F <- function(amount_of_variants) {
 inputPanel(
   sliderInput("k_reciprocal_relative_frequency", label = "k",
                min = 50, max = 150, value = 100, step = 10),
-  sliderInput("number_of_replications_reciprocal_relative_frequency", label = "Number of random creations of p",
+  sliderInput("number_of_replications_reciprocal_relative_frequency", label = "Number of simulation runs",
                min = 100, max = 1000, value = 500, step = 100),
   actionButton("run_button_reciprocal_relative_frequency", "Run simulation")
 )
@@ -564,7 +564,7 @@ H <- function(amount_of_variants) {
 inputPanel(
   sliderInput("k_shannon", label = "k",
                min = 50, max = 150, value = 100, step = 10),
-  sliderInput("number_of_replications_shannon", label = "Number of random creations of p",
+  sliderInput("number_of_replications_shannon", label = "Number of simulation runs",
                min = 100, max = 1000, value = 500, step = 100),
   actionButton("run_button_shannon", "Run simulation")
 )
@@ -607,9 +607,9 @@ renderPlot({
 })
 ```
 
-To deal with the problem of sample-size dependency in the calculation of $t_F$ with equation (7), we have to consider that $θ$ also controls a characteristic probability distribution of variants. (7) shows how $θ$ is related to the sum of squared variant frequencies in a population, so it should be possible to predict for a given value of $θ$ how many variants occur with certain frequencies. When $θ$ is low ($θ \ll 1$), we should expect that most of the time , a population will be dominated by a few variants, with other variants at low frequencies. When $θ$ is high ($θ \gg 1$), we are more likely to see a large number of variants at low to moderate frequencies. 
+To deal with the problem of sample-size dependency in the calculation of $t_F$ with equation (7), we have to consider that $θ$ also controls a characteristic probability distribution of variants. (7) shows how $θ$ is related to the sum of squared variant frequencies in a population, so it should be possible to predict for a given value of $θ$ how many variants occur with certain frequencies. When $θ$ is low ($θ \ll 1$), we should expect that most of the time, a population will be dominated by a few variants, with other variants at low frequencies. When $θ$ is high ($θ \gg 1$), we are more likely to see a large number of variants at low to moderate frequencies. 
 
-By combining this frequency distribution with the probability that a variant at a given frequency is represented at least once in a sample of a given size drawn at random from the population, it should be possible to deduce how many different variants we can expect to find in a sample of a given size. If the variants are selectively neutral, the expected number of different variants $k$ found in a sample drawn from a population is a function of the sample size $n$ and the $θ$. The number of variants will be larger when either $θ$ or $n$ are large.
+By combining this frequency distribution with the probability that a variant at a given frequency is represented at least once in a sample of a given size drawn at random from the population, it should be possible to deduce how many different variants we can expect to find in a sample of a given size. If the variants are selectively neutral, the expected number of different variants $k$ found in a sample drawn from a population is a function of it's sample size $n$ and $θ$ value. The number of variants will be larger when either $θ$ or $n$ are large.
 
 $$E(k) = \sum_{i = 0}^{n - 1} \frac{θ}{θ + i}$$
 
@@ -768,7 +768,7 @@ renderPlot({
 })
 ```
 
-The study of intergroup cultural transmission requires a model setup that contains the effect of drift but also exchange between groups. One promising approach comes from migration matrix models, which in population genetics have proven useful in studying the effects of drift and intergroup genetic transmission on genetic distances among small, localized demes. Such models reveal what happens to variant frequencies in a finite number of demes that are subject to the joint effects of drift, whose strength is controlled by the effective size of each population, and intergroup transmission, occurring between demes at constant pairwise rates. There is no role role in these models for in situ innovation, but they offer a means of checking the assumption that variation in $θ$ is largely a function of intergroup transmission. 
+The study of intergroup cultural transmission requires a model setup that contains the effect of drift but also exchange between groups. One promising approach comes from migration matrix models, which in population genetics have proven useful in studying the effects of drift and intergroup genetic transmission on genetic distances among small, localized demes. Such models reveal what happens to variant frequencies in a finite number of demes that are subject to the joint effects of drift, whose strength is controlled by the effective size of each population, and intergroup transmission, occurring between demes at constant pairwise rates. There is no role in these models for in situ innovation, but they offer a means of checking the assumption that variation in $θ$ is largely a function of intergroup transmission. 
 
 The following simulation is constructed like the very first one about the effects of drift. Only in this case, there is a set probability, the intergroup transmission rate $m_i$, that the individual contacted is derived from the other group. If $m_i = 0$, both groups act independently, but if it increases they tend to develop roughly alike.
 
@@ -893,21 +893,19 @@ renderPlot({
 
 #### Stylistic Distances for Multiple Groups *p.24-25* **(11)** **(12)**
 
-The real world is better represented in terms of more than two groups learning from another. The multi-group case can be described in a matrix based model. The visualization for this model can be found in the next segment "Diversity and Distance for Individual Assemblages". 
+The real world is better represented in terms of more than two groups learning from another. The multi-group case can be described in a matrix based model. The matrix $\mathbf{M}$ contains the intergroup transmission rates $m_{ij}$ that give the proportion of the $i$'th deme that learned from the $j$'th deme. The diagonal elements of $\mathbf{M}$ are the proportion of each deme that learned from its own members. The matrix $\mathbf{U}$ contains the reciprocals of the effective population sizes $1 / N_e$ of each group on its diagonal and $0$'s elsewhere. 
 
-The matrix $\mathbf{M}$ contains the intergroup transmission rates $m_{ij}$ that give the proportion of the $i$'th deme that learned from the $j$'th deme. The diagonal elements of $\mathbf{M}$ are the proportion of each deme that learned from its own members. The matrix $\mathbf{U}$ contains the reciprocals of the effective population sizes $1 / N_e$ of each group on its diagonal and 0's elsewhere. 
-
-In this setup all groups initially have the same variant frequencies. This means that the expected frequencies for each group in any time period are identical and equal to the starting frequency. Drift-driven departures from this expectation for a given deme can be characterized analytically in terms of variance. Since there are multiple demes in the system, their joint evolution must be handled in terms of a matrix of variances and covariances: $\mathbf{V}^{(t)}$. Diagonal elements in $\mathbf{V}^{(t)}$ contain variances: the square of the departure of the variant frequency in the respective deme at time $t$ from the situation at the starting time. The other elements are covariances: the product of the departures of the variant frequencies in each pair of demes. 
+In this setup all groups initially have the same variant frequencies. This means that the expected frequencies for each group in any time period are identical and equal to the starting frequency. Drift-driven departures from this expectation for a given deme can be characterized analytically in terms of variance. Since there are multiple demes in the system, their joint evolution must be handled in terms of a matrix of variances and covariances: $\mathbf{V}$. Diagonal elements in $\mathbf{V}$ contain variances: the square of the departure of the variant frequency in the respective deme at time $t$ from the situation at the starting time. The other elements are covariances: the product of the departures of the variant frequencies in each pair of demes. 
 
 $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
 
 - $\mathbf{M}$: Matrix of intergroup transmission rates
 - $\mathbf{V}^{(t)}$: Matrix of variances and covariances
 - $r$: Index of the successive time periods
-- $\mathbf{U}$ Matrix of reciprocals of the effective population sizes ($1 / N_e$). These are on the diagonal, the rest is 0.
+- $\mathbf{U}$ Matrix of reciprocals of the effective population sizes ($1 / N_e$). These are on the diagonal, the rest is $0$
 - $(\mathbf{M}^r)^{\prime}$: M transposed
 
-Equation 11 says that in the first time period, the covariance between two groups is a function of the sum of products of the intergroup transmission rates from all groups to those two groups and the reciprocal of their two effective population sizes. In later time periods, as individuals who learned from non-group members are in turn distributed among the other groups, the intergroup transmission rates from each group to *all* the others assumes increasing importance. The resulting cumulative effect of the indirect movement of variants among groups is handled by successively powering the intergroup transmission matrix.
+Equation (11) says that in the first time period, the covariance between two groups is a function of the sum of products of the intergroup transmission rates from all groups to those two groups and the reciprocal of their two effective population sizes. In later time periods, as individuals who learned from non-group members are in turn distributed among the other groups, the intergroup transmission rates from each group to *all* the others assumes increasing importance. The resulting cumulative effect of the indirect movement of variants among groups is handled by successively powering the intergroup transmission matrix.
 
 The magnitude of the covariance between two groups will scale inversely with their sizes $N$ and positively with the intergroup transmission rates $m$. High levels of intergroup transmission will mean that whatever departures from the initial frequency occur, they will be similar and in the same direction, hence the covariance between the groups will be high. On the other hand, if either or both group sizes are low, causing drift to play a stronger role, variant frequencies are less likely to depart from initial frequencies in a similar fashion. The covariances will be low.
 
@@ -970,11 +968,11 @@ height = 1200
 
 #### Trends in Interassemblage Distance *p.25-26* 
 
-The migration matrix approach can be applied to cultural transmission contexts by computing a matrix of squared Euclidian distances $\mathbf{SED}$ between the groups for each of the variants. We expect to find that the overall level of differentiation among groups, as measured by the mean of the squared Euclidian distances $\mathbf{MSD}$, is the mirror image of our estimates of $θ$.
+The migration matrix approach can be applied to cultural transmission contexts by computing a matrix of squared Euclidean distances $\mathbf{SED}$ between the groups for each of the variants. We expect to find that the overall level of differentiation among groups, as measured by the mean of the squared Euclidean distances $\mathbf{MSD}$, is the mirror image of our estimates of $θ$.
 
 #### Diversity and Distance for Individual Assemblages *p.26-27* **(13)**
 
-The mean of the squared Euclidian distance $\bar{d}_{i}^{2}$ (or $MSD$) kann be calculated with (13). 
+The mean of the squared Euclidean distance $\bar{d}_{i}^{2}$ (or $MSD$) can be calculated with (13). 
 
 $$\bar{d}_{i}^{2} = \sum_{j = 1}^{n} d_{ij}^{2} / (n - 1), i \neq j$$
 
