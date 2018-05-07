@@ -891,7 +891,9 @@ renderPlot({
 
 #### Stylistic Distances for Multiple Groups *p.24-25* **(11)** **(12)**
 
-The real world is better represented in terms of more than two groups learning from another. The multi-group case can be despribed in a matrix based model. The matrix $\mathbf{M}$ contains the intergroup transmission rates $m_{ij}$ that give the proportion of the $i$'th deme that learned from the $j$'th deme. The diagonal elements of $\mathbf{M}$ are the proportion of each deme that learned from its own members. The matrix $\mathbf{U}$ contains the reciprocals of the effective population sizes $1 / N_e$ of each group on its diagonal and 0's elsewhere. 
+The real world is better represented in terms of more than two groups learning from another. The multi-group case can be despribed in a matrix based model. The visualization for this model can be found in the next segment "Diversity and Distance for Individual Assemblages". 
+
+The matrix $\mathbf{M}$ contains the intergroup transmission rates $m_{ij}$ that give the proportion of the $i$'th deme that learned from the $j$'th deme. The diagonal elements of $\mathbf{M}$ are the proportion of each deme that learned from its own members. The matrix $\mathbf{U}$ contains the reciprocals of the effective population sizes $1 / N_e$ of each group on its diagonal and 0's elsewhere. 
 
 In this setup all groups initially have the same variant frequencies. This means that the expected frequencies for each group in any time period are identical and equal to the starting frequency. Drift-driven departures from this expectation for a given deme can be characterized analytically in terms of variance. Since there are multiple demes in the system, their joint evolution must be handled in terms of a matrix of variances and covariances: $\mathbf{V}^{(t)}$. Diagonal elements in $\mathbf{V}^{(t)}$ contain variances: the square of the departure of the variant frequency in the respective deme at time $t$ from the situation at the starting time. The other elements are covariances: the product of the departures of the variant frequencies in each pair of demes. 
 
@@ -902,6 +904,12 @@ $$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^
 - $r$: Index of the successive time periods
 - $\mathbf{U}$ Matrix of reciprocals of the effective population sizes ($1 / N_e$). These are on the diagonal, the rest is 0.
 - $(\mathbf{M}^r)^{\prime}$: M transponiert
+
+Equation 11 says that in the first time period, the covariance between two groups is a function of the sum of products of the intergroup transmission rates from all groups to those two groups and the reciprocal of their two effective population sizes. In later time periods, as individuals who learned from non-group members are in turn distributed among the other groups, the intergroup transmission rates from each group to *all* the others assumes increasing importance. The resulting cumulative effect of the indirect movement of variants among groups is handled by successively powering the intergroup transmission matrix.
+
+The magnitude of the covariance between two groups will scale inversely with their sizes $N$ and positively with the intergroup transmission rates $m$. High levels of intergroup transmission will mean that whatever departures from the initial frequency occur, they will be similar and in the same direction, hence the covariance between the groups will be high. On the other hand, if either or both group sizes are low, causing drift to play a stronger role, variant frequencies are less likely to depart from initial frequencies in a similar fashion. The covariances will be low.
+
+The matrix of variances and covariances $\mathbf{V}$ can be converted to a matrix of squared Euclidian distances $d_{ij}^{2(t)}$.
 
 $$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
 
