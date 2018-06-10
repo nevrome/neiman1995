@@ -1,0 +1,1027 @@
+---
+title: "Neiman 1995: 'Stylistic variation in evolutionary perspective'"
+author: "Clemens Schmid"
+date: "Juni 2018"
+output: 
+  ioslides_presentation:
+    css: styles_presentation.css
+    widescreen: true
+    smaller: true
+runtime: shiny
+bibliography: references.bib
+link-citations: true
+---
+
+```{r include=FALSE}
+# knitr chunk settings
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo = FALSE}
+# load the packages, that are inconvinient to reference directly via namespace::
+library(ggplot2)
+library(magrittr)
+suppressMessages(library(expm))
+# load the functions in the source files
+purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
+```
+
+# Drift, Innovation and Diversity
+
+## Temporal Dynamics of Drift
+
+- $k$: Amount of variants in a population
+- $N_e$: Size of the effective population. The effective population consists of the individuals within a population that is actively involved in a cultural transmission process
+- $t$: Time / number of iterations
+
+## Temporal Dynamics of Drift
+
+```{r echo=FALSE}
+inputPanel(
+  sliderInput("k_drift_simulation", label = "k",
+               min = 5, max = 15, value = 10, step = 1),
+  sliderInput("Ne_drift_simulation", label = "Ne",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_drift_simulation", label = "t",
+               min = 50, max = 200, value = 100, step = 50),
+  actionButton("run_button_drift_simulation", "Run simulation")
+)
+
+drift_simulation_data <- eventReactive(
+  input$run_button_drift_simulation, {
+    
+    # read input
+    k <- input$k_drift_simulation
+    N <- input$Ne_drift_simulation
+    time <- input$t_drift_simulation
+    
+    # calculate population parameters
+    population <- 1:N
+    variants <- 1:k
+    timesteps <- 2:time
+    
+    # create initial population
+    pop0 <- tibble::tibble(
+      time = as.integer(0),
+      individual = 1:N,
+      variant = rep_len(1:k, N)
+    )
+    
+    # list to store population stages over time
+    pop_devel <- list()
+    pop_devel[[1]] <- pop0
+    
+    # simulation loop
+    for (p1 in timesteps) {
+      pop_new <- pop_devel[[p1 - 1]] 
+      pop_new$time <- p1 - 1
+      pop_new$variant <- sample(pop_new$variant, length(pop_new$variant), replace = T)
+      pop_devel[[p1]] <- pop_new
+    }
+    
+    # bind individual population stages into data.frame
+    pop_devel_df <- do.call(rbind, pop_devel)
+    
+    # calculate number of individuals per timestep and variant
+    pop_devel_sum <- pop_devel_df %>%
+      dplyr::group_by(
+        time, variant
+      ) %>%
+      dplyr::summarise(
+        individuals_with_variant = n()
+      ) %>%
+      dplyr::ungroup() %>%
+      # complete (expand.grid) to fill gaps in the area plot
+      tidyr::complete(
+        time, 
+        variant, 
+        fill = list(individuals_with_variant = as.integer(0))
+      )
+    
+    pop_devel_sum
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  
+  drift_simulation_data() %>%
+    ggplot() +
+      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+      theme_bw() +
+      xlab(expression(paste("t"))) +
+      ylab("variants and their occurence in the population [%]")
+  
+})
+```
+
+## Homogeneity Under Drift
+
+- $F_t$: Within-population homogeneity. That's the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant at a certain time step
+- $F_{t - 1}$: Probability that the model of the second individual learned from the same model as the model of the first individual in an earlier time step
+
+## Homogeneity Under Drift
+
+```{r echo=FALSE}
+Ft <- function(F0, Ne, time) {
+  if(time == 0) { return(F0) }
+  1/Ne + (1 - 1/Ne) * Ft(F0, Ne, time - 1)
+}
+
+inputPanel(
+  sliderInput("F0_homogeneity_drift", label = "F0 (Ft for t == 0)",
+               min = 0, max = 1, value = 0.5, step = 0.05),
+  sliderInput("Ne_homogeneity_drift", label = "Ne",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_homogeneity_drift", label = "t",
+               min = 50, max = 200, value = 100, step = 50)
+)
+
+renderPlot({
+  
+  # read input
+  F0 <- input$F0_homogeneity_drift
+  Ne <- input$Ne_homogeneity_drift
+  time <- input$t_homogeneity_drift
+  
+  timesteps <- 0:time
+  
+  # apply function for all timesteps
+  Ft_time <- sapply(timesteps, function(x) { Ft(F0, Ne, x) })
+  
+  data.frame(
+    t = timesteps,
+    Ft = Ft_time
+  ) %>%
+    ggplot() +
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(t, Ft), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("t")) +
+      ylab(latex2exp::TeX("F_{t}"))
+})
+```
+
+## Temporal Dynamics of Drift and Innovation
+
+- $μ$: Innovation rate. Probability of the creation of a new variant
+
+## Temporal Dynamics of Drift and Innovation
+
+```{r echo=FALSE}
+inputPanel(
+  sliderInput("k_drift_simulation_with_innovation", label = "k for t == 0",
+               min = 5, max = 15, value = 10, step = 1),
+  sliderInput("Ne_drift_simulation_with_innovation", label = "Ne",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_drift_simulation_with_innovation", label = "t",
+               min = 50, max = 200, value = 100, step = 50),
+  sliderInput("mu_drift_simulation_with_innovation", label = "μ",
+               min = 0, max = 0.1, value = 0.01, step = 0.01),
+  actionButton("run_button_drift_simulation_with_innovation", "Run simulation")
+)
+
+drift_simulation_with_innovation_data <- eventReactive(
+  input$run_button_drift_simulation_with_innovation, {
+    
+    # read input
+    k <- input$k_drift_simulation_with_innovation
+    N <- input$Ne_drift_simulation_with_innovation
+    time <- input$t_drift_simulation_with_innovation
+    mu <- input$mu_drift_simulation_with_innovation
+  
+    # prepare population parameters
+    population <- 1:N
+    variants <- 1:k
+    timesteps <- 2:time
+  
+    # create starting population
+    pop0 <- tibble::tibble(
+      time = as.integer(0),
+      individual = 1:N,
+      variant = rep_len(1:k, N)
+    )
+  
+    # list to store population stages over time
+    pop_devel <- list()
+    pop_devel[[1]] <- pop0
+  
+    # simulation loop
+    last_variant <- max(pop_devel[[1]]$variant)
+    for (p1 in timesteps) {
+      pop_new <- pop_devel[[p1 - 1]]
+      pop_new$time <- p1 - 1
+      pop_new$variant <- sample(pop_new$variant, length(pop_new$variant), replace = T)
+  
+      # innovation
+      innovate_here <- sample(
+        c(TRUE, FALSE), 
+        length(pop_new$variant), 
+        prob = c(mu, 1 - mu), 
+        replace = T
+      )
+      new_variants <- seq(last_variant + 1, last_variant + sum(innovate_here))
+      last_variant <- last_variant + sum(innovate_here)
+      pop_new$variant[innovate_here] <- new_variants
+  
+      pop_devel[[p1]] <- pop_new
+    }
+  
+    # bind individual population stages into data.frame
+    pop_devel_df <- do.call(rbind, pop_devel)
+    
+    # calculate number of individuals per timestep and variant
+    pop_devel_sum <- pop_devel_df %>%
+      dplyr::group_by(
+        time, variant
+      ) %>%
+      dplyr::summarise(
+        individuals_with_variant = n()
+      ) %>%
+      dplyr::ungroup() %>%
+      tidyr::complete(
+        time, 
+        variant, 
+        fill = list(individuals_with_variant = as.integer(0))
+      )
+    
+    pop_devel_sum
+  
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  drift_simulation_with_innovation_data() %>%
+    ggplot() +
+      geom_area(aes(x = time, y = individuals_with_variant, fill = variant, group = variant)) +
+      geom_line(aes(x = time, y = individuals_with_variant, group = variant), position = "stack") +
+      theme_bw() +
+      xlab("t") +
+      ylab("variants and their occurence in the population [%]")
+})
+```
+
+## Homogeneity Under Drift and Innovation
+
+$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
+
+## Homogeneity Under Drift and Innovation
+
+```{r echo=FALSE}
+Ft_innovation <- function(F0, Ne, time, mu) {
+  if(time == 0) {return(F0)}
+  (1/Ne + (1 - 1/Ne) * Ft_innovation(F0, Ne, time - 1, mu)) * (1 - mu)^2
+}
+
+inputPanel(
+  sliderInput("F0_homogeneity_drift_with_innovation", label = "F0 (Ft for t == 0)",
+               min = 0, max = 1, value = 0.5, step = 0.05),
+  sliderInput("Ne_homogeneity_drift_with_innovation", label = "Ne",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_homogeneity_drift_with_innovation", label = "t",
+               min = 50, max = 200, value = 100, step = 50),
+  sliderInput("mu_homogeneity_drift_with_innovation", label = "μ",
+               min = 0, max = 1, value = 0.1, step = 0.1)
+)
+
+renderPlot({
+  
+  # read input
+  F0 <- input$F0_homogeneity_drift_with_innovation
+  Ne <- input$Ne_homogeneity_drift_with_innovation
+  mu <- input$mu_homogeneity_drift_with_innovation
+  time <- input$t_homogeneity_drift_with_innovation
+  
+  timesteps <- 0:time
+  
+  # apply function for every timestep
+  Ft_innovation_time <- sapply(timesteps, function(x) {Ft_innovation(F0, Ne, x, mu)})
+  
+  data.frame(
+    t = timesteps,
+    Ft = Ft_innovation_time
+  ) %>%
+    ggplot() +    
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(t, Ft), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("t")) +
+      ylab(latex2exp::TeX("F_{t}"))
+})
+```
+
+## Homogeneity Under Drift and Innovation
+
+- $θ$: Twice the effective population size times the innovation rate ($2 N_e μ$)
+
+## Homogeneity Under Drift and Innovation
+
+```{r echo=FALSE}
+theta <- function(Ne, mu) {
+  (2 * Ne * mu)
+}
+
+Fhat <- function(theta) {
+  1 / (theta + 1)
+}
+
+inputPanel(
+  sliderInput("Ne_homogeneity_equilibrium", label = "Ne",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("mu_homogeneity_equilibrium", label = "μ",
+               min = 0, max = 1, value = 0.1, step = 0.1)
+)
+
+renderText({
+  paste0("1 * theta = ", theta(input$Ne_homogeneity_equilibrium, input$mu_homogeneity_equilibrium))
+})
+
+renderPlot({
+  Ne <- input$Ne_homogeneity_equilibrium
+  mu <- input$mu_homogeneity_equilibrium
+  
+  tibble::tibble(
+    theta = 0:100 * theta(Ne, mu),
+    Fhat = sapply(theta, function(x) {Fhat(x)})
+  ) %>%
+    ggplot() +    
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(theta, Fhat), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("θ")) +
+      ylab(latex2exp::TeX("\\hat{F}"))
+})
+```
+
+## Homogeneity Under Drift and Innovation
+
+- $p_i$: relative frequency of the $i$'th variant in the population 
+
+## Homogeneity Under Drift and Innovation
+
+```{r echo=FALSE}
+Fhat_relative_frequency <- function(amount_of_variants) {
+  p <- runif(amount_of_variants)
+  p <- p / sum(p)
+  sum(p^2)
+}
+
+inputPanel(
+  sliderInput("k_relative_frequency", label = "k",
+               min = 50, max = 150, value = 100, step = 10),
+  sliderInput("number_of_replications_relative_frequency", label = "Number of simulation runs",
+               min = 100, max = 1000, value = 500, step = 100),
+  actionButton("run_button_relative_frequency", "Run simulation")
+)
+
+relative_frequency_data <- eventReactive(
+  input$run_button_relative_frequency, {
+  
+    # read input  
+    number_of_replications <- input$number_of_replications_relative_frequency
+    k <- input$k_relative_frequency
+    
+    # calculate Fhat
+    tibble::tibble(
+      k = 0:k,
+      Fhat_min = sapply(k, function(x) {
+        min(replicate(number_of_replications, Fhat_relative_frequency(x)))
+      }),
+      Fhat_max = sapply(k, function(x) {
+        max(replicate(number_of_replications, Fhat_relative_frequency(x)))
+      }),
+      Fhat_mean = (Fhat_min + Fhat_max) / 2
+    )
+    
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  relative_frequency_data() %>%
+    ggplot() +    
+      geom_hline(aes(yintercept = 1), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_ribbon(
+        aes(x = k, ymin = Fhat_min, ymax = Fhat_max), 
+        fill = "deepskyblue", alpha = 0.5
+      ) +
+      geom_line(aes(x = k, y = Fhat_mean), color = "black", size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("k")) +
+      ylab(latex2exp::TeX("\\hat{F}"))
+})
+```
+
+## Diversity
+
+$$n_e = 2 N_e μ + 1$$
+
+- $n_e$: Effective number of variants
+
+## Diversity
+
+```{r echo=FALSE}
+ne <- function(theta) {
+  theta + 1
+}
+
+inputPanel(
+  sliderInput("Ne_diversity_effective_number", label = "Ne",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("mu_diversity_effective_number", label = "μ",
+               min = 0, max = 1, value = 0.01, step = 0.01)
+)
+
+renderText({
+  paste0("1 * theta = ", theta(input$Ne_diversity_effective_number, input$mu_diversity_effective_number))
+})
+
+renderPlot({
+  
+  # read input
+  Ne <- input$Ne_diversity_effective_number
+  mu <- input$mu_diversity_effective_number  
+  
+  tibble::tibble(
+    theta = 0:100 * theta(Ne, mu),
+    ne = sapply(theta, function(x) {ne(x)})
+  ) %>%
+    ggplot() +    
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(theta, ne), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("θ")) +
+      ylab(latex2exp::TeX("n_e"))
+})
+```
+
+## Diversity
+
+$$n_e = 2 N_e μ + 1$$
+
+- $n_e$: Effective number of variants
+
+## Diversity
+
+```{r echo=FALSE}
+theta_F <- function(amount_of_variants) {
+  p <- runif(amount_of_variants)
+  p <- p / sum(p)
+  (1 / sum(p^2)) - 1
+}
+
+inputPanel(
+  sliderInput("k_reciprocal_relative_frequency", label = "k",
+               min = 50, max = 150, value = 100, step = 10),
+  sliderInput("number_of_replications_reciprocal_relative_frequency", label = "Number of simulation runs",
+               min = 100, max = 1000, value = 500, step = 100),
+  actionButton("run_button_reciprocal_relative_frequency", "Run simulation")
+)
+
+reciprocal_relative_frequency_data <- eventReactive(
+  input$run_button_reciprocal_relative_frequency, {
+  
+    # read input  
+    number_of_replications <- input$number_of_replications_reciprocal_relative_frequency
+    k <- input$k_reciprocal_relative_frequency
+    
+    # calculate Fhat
+    tibble::tibble(
+      k = 0:k,
+      theta_F_min = sapply(k, function(x) {
+        min(replicate(number_of_replications, theta_F(x)))
+      }),
+      theta_F_max = sapply(k, function(x) {
+        max(replicate(number_of_replications, theta_F(x)))
+      }),
+      theta_F_mean = (theta_F_min + theta_F_max) / 2
+    )
+    
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  reciprocal_relative_frequency_data() %>%
+    ggplot() +    
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_ribbon(
+        aes(x = k, ymin = theta_F_min, ymax = theta_F_max), 
+        fill = "deepskyblue", alpha = 0.5
+      ) +
+      geom_line(aes(x = k, y = theta_F_mean), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("k")) +
+      ylab(latex2exp::TeX("t_F"))
+})
+```
+
+# Archaeological Application
+
+## Diversity and Sample Size
+
+$$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
+
+- $H$: [Shannon's diversity index](http://www.tiem.utk.edu/~gross/bioed/bealsmodules/shannonDI.html)
+
+## Diversity and Sample Size
+
+```{r echo=FALSE}
+H <- function(amount_of_variants) {
+  p <- runif(amount_of_variants)
+  p <- p / sum(p)
+  -sum(p * log(p))
+}
+
+inputPanel(
+  sliderInput("k_shannon", label = "k",
+               min = 50, max = 150, value = 100, step = 10),
+  sliderInput("number_of_replications_shannon", label = "Number of simulation runs",
+               min = 100, max = 1000, value = 500, step = 100),
+  actionButton("run_button_shannon", "Run simulation")
+)
+
+shannon_data <- eventReactive(
+  input$run_button_shannon, {
+  
+    # read input  
+    number_of_replications <- input$number_of_replications_shannon
+    k <- input$k_shannon
+    
+    # calculate Fhat
+    tibble::tibble(
+      k = 0:k,
+      H_min = sapply(k, function(x) {
+        min(replicate(number_of_replications, H(x)))
+      }),
+      H_max = sapply(k, function(x) {
+        max(replicate(number_of_replications, H(x)))
+      }),
+      H_mean = (H_min + H_max) / 2
+    ) 
+    
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  shannon_data() %>%
+    ggplot() +    
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_ribbon(
+        aes(x = k, ymin = H_min, ymax = H_max), 
+        fill = "deepskyblue", alpha = 0.5
+      ) +
+      geom_line(aes(x = k, y = H_mean), color = "black", size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("k")) +
+      ylab(latex2exp::TeX("H"))
+})
+```
+
+## Diversity and Sample Size
+
+$$E(k) = \sum_{i = 0}^{n - 1} \frac{θ}{θ + i}$$
+
+- $E(k)$: Expected number of different variants
+- $n$: Sample size
+
+## Diversity and Sample Size
+
+```{r echo=FALSE}
+Ek <- function(n, theta) {
+  ressum <- 0
+  for (i in 0:(n-1)) {
+    ressum = ressum + (theta / (theta + i))
+  }
+  return(ressum)
+}
+
+inputPanel(
+  sliderInput("Ne_expected_variants", label = "Ne",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("mu_expected_variants", label = "μ",
+               min = 0, max = 1, value = 0.01, step = 0.01),
+  sliderInput("n_expected_variants", label = "n",
+               min = 0, max = 100, value = 10, step = 1)
+)
+
+renderText({
+  paste0("1 * theta = ", theta(input$Ne_expected_variants, input$mu_expected_variants))
+})
+
+renderPlot({
+  
+  # read input
+  Ne <- input$Ne_expected_variants
+  mu <- input$mu_expected_variants
+  n <- input$n_expected_variants
+  
+  tibble::tibble(
+    theta = 0:100 * theta(Ne, mu),
+    n = rep(n, 101),
+    Ek = purrr::map2_dbl(n, theta, function(a, b) {Ek(a, b)})
+  ) %>%
+    ggplot() +    
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_line(aes(theta, Ek), size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("θ")) +
+      ylab(latex2exp::TeX("E(k)"))
+})
+```
+
+## Diversity and Sample Size
+
+## Diversity and Sample Size
+
+```{r echo=FALSE}
+inputPanel(
+  sliderInput("n_iterative_theta", label = "n",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("k_iterative_theta", label = "k",
+               min = 5, max = 15, value = 10, step = 1),
+  actionButton("run_iterative_theta", "Approximate theta")
+)
+
+iterative_theta_data <- eventReactive(
+  input$run_iterative_theta, {
+  
+    # read input
+    n <- input$n_iterative_theta
+    k <- input$k_iterative_theta
+    start_theta <- 10
+    
+    # iterative solving loop
+    theta_iter <- start_theta
+    while (TRUE) {
+      diffi <- Ek(n, theta_iter) - k
+      if (diffi < 0) {
+        theta_iter <- theta_iter + 0.1
+      } else if (diffi > 0) {
+        theta_iter <- theta_iter - 0.1
+      }
+      if (abs(diffi) < 0.5) {
+        break;
+      }
+    }
+  
+    theta_iter
+  
+  },
+  ignoreNULL = FALSE
+)
+
+renderText({
+  paste0("theta ≈ ", round(iterative_theta_data(), 2))
+})
+```
+
+## Archaeological Sample Size
+
+## Inferences About Group Size and Innovation Rate
+
+# Drift, Intergroup Transmission, and Interassemblage Distance
+
+## Dynamics of Stylistic Distance between Two Groups
+
+$$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
+
+- $d_{ij}^2$: Squared Euclidean distance between two groups
+- $n$: total amount of variants (here not sample size)
+
+## Dynamics of Stylistic Distance between Two Groups
+
+```{r echo=FALSE}
+inputPanel(
+  sliderInput("n_sed_general", label = "n",
+               min = 10, max = 100, value = 50, step = 10),
+  actionButton("run_sed_general", "Run simulation")
+)
+
+sed_general_data <- eventReactive(
+  input$run_sed_general, {
+  
+    # read input
+    n <- input$n_sed_general
+
+    # calculate 
+    tibble::tibble(
+      amount_of_variants = 0:n,
+      sed_min = sapply(amount_of_variants, function(x) {
+        min(replicate(500, sed(runif(x), runif(x))))
+      }),
+      sed_max = sapply(amount_of_variants, function(x) {
+        max(replicate(500, sed(runif(x), runif(x))))
+      }),
+      sed_mean = (sed_min + sed_max) / 2
+    )
+  
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  sed_general_data() %>%
+    ggplot() +    
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_ribbon(
+        aes(x = amount_of_variants, ymin = sed_min, ymax = sed_max), 
+        fill = "deepskyblue", alpha = 0.5
+      ) +
+      geom_line(aes(x = amount_of_variants, y = sed_mean), color = "black", size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("k")) +
+      ylab(latex2exp::TeX("d_{ij}^2"))
+})
+```
+
+## Dynamics of Stylistic Distance between Two Groups
+
+## Dynamics of Stylistic Distance between Two Groups
+
+```{r echo=FALSE}
+inputPanel(
+  sliderInput("k_two_groups", label = "k",
+               min = 5, max = 15, value = 10, step = 1),
+  sliderInput("N_two_groups", label = "N",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_two_groups", label = "t",
+               min = 50, max = 200, value = 100, step = 50),
+  sliderInput("mi_two_groups", label = "mi",
+               min = 0, max = 1, value = 0.1, step = 0.01),
+  actionButton("run_button_two_groups", "Run simulation")
+)
+
+group_drift_simulation_data <- eventReactive(
+  input$run_button_group_drift_simulation, {
+    
+    # run simulation (code in source file)
+    group_drift_simulation(
+      input$k_two_groups, 
+      input$N_two_groups, 
+      input$t_two_groups, 
+      input$mi_two_groups
+    )
+    
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  A <- group_drift_simulation_data() %>%
+    ggplot() +
+      geom_area(
+        aes(x = time, y = individuals_with_variant, fill = variant, group = variant)
+      ) +
+      geom_line(
+        aes(x = time, y = individuals_with_variant, group = variant), 
+        position = "stack"
+      ) +
+      theme_bw() +
+      xlab("t") +
+      ylab("variants and their occurence in the population [%]") +
+      facet_grid(group ~ .)
+  
+  B <- calculate_sed_for_group_drift_simulation_result(
+    group_drift_simulation_data()
+  ) %>%
+    ggplot() +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
+      geom_line(aes(x = t, y = sed), color = "black", size = 1, alpha = 0.3) +
+      geom_point(aes(x = t, y = sed), color = "black", size = 1) +
+      theme_bw()  +
+      xlab(latex2exp::TeX("t")) +
+      ylab(latex2exp::TeX("d_{ij}^2"))
+  
+  cowplot::plot_grid(A, B, nrow = 2, align = "v", axis = "lr")
+})
+```
+
+## Dynamics of Stylistic Distance between Two Groups
+
+```{r echo=FALSE}
+inputPanel(
+  sliderInput("k_two_groups_many_runs", label = "k",
+               min = 5, max = 15, value = 10, step = 1),
+  sliderInput("N_two_groups_many_runs", label = "N",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_two_groups_many_runs", label = "t",
+               min = 20, max = 200, value = 20, step = 20),
+  sliderInput("mi_two_groups_many_runs", label = "mi",
+               min = 0, max = 1, value = 0.1, step = 0.01),
+  sliderInput("sim_runs_two_groups_many_runs", label = "Number of simulation runs",
+               min = 1, max = 100, value = 20, step = 1),
+  actionButton("run_button_two_groups_many_runs", "Run simulation")
+)
+
+two_groups_many_runs_data <- eventReactive(
+  input$run_button_two_groups_many_runs, {
+    
+    # run the simulation many times and store results in res_list
+    res_list <- list()
+    for (i in 1:input$sim_runs_two_groups_many_runs) {
+      res_list[[i]] <- calculate_sed_for_group_drift_simulation_result(
+        group_drift_simulation(
+          input$k_two_groups_many_runs, 
+          input$N_two_groups_many_runs, 
+          input$t_two_groups_many_runs, 
+          input$mi_two_groups_many_runs
+        ),
+        sim_run = i
+      ) 
+    }
+    
+    # rbind individual simulation results into one data.frame
+    do.call(rbind, res_list)
+    
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  two_groups_many_runs_data() %>%
+    ggplot() +
+      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+      geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
+      geom_line(aes(x = t, y = sed, group = sim_run), color = "black", size = 1, alpha = 0.3) +
+      geom_point(aes(x = t, y = sed), color = "black", size = 1) +
+      theme_bw() +
+      xlab(latex2exp::TeX("t")) +
+      ylab(latex2exp::TeX("d_{ij}^2"))
+})
+```
+
+## Stylistic Distances for Multiple Groups
+
+$$\mathbf{V}^{(t)} = \sum_{r = 0}^{t - 1} \mathbf{M}^r \mathbf{U}(\mathbf{M}^r)^{\prime}$$
+
+- $\mathbf{M}$: Matrix of intergroup transmission rates
+- $\mathbf{V}^{(t)}$: Matrix of variances and covariances
+- $r$: Index of the successive time periods
+- $\mathbf{U}$ Matrix of reciprocals of the effective population sizes ($1 / N_e$). These are on the diagonal, the rest is $0$
+- $(\mathbf{M}^r)^{\prime}$: M transposed
+
+$$d_{ij}^{2(t)} = v_{ii}^{(t)} + v_{jj}^{(t)} - 2 v_{ij}^{(t)}$$
+
+- $v_{ii}^{(t)}$: Diagonal element of $\mathbf{V}^{(t)}$ -- a variance. The square of of the departure of the variant frequency in the $i$'th deme at time $t$ from its starting frequency when the demes were identical, standardized by the variance of that starting frequency
+- $v_{ij}^{(t)}$: Covariance. The product of the departures of the variant frequencies in each pair of demes $i$ and $j$, again standardized by the variance of the starting frequency
+
+## Stylistic Distances for Multiple Groups
+
+```{r echo = FALSE}
+inputPanel(
+  sliderInput("Ne_matrix", label = "Ne",
+             min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_matrix", label = "t",
+             min = 10, max = 100, value = 20, step = 10),
+  actionButton("run_button_matrix_calculation", "Run matrix calculation")
+)
+
+matrix_calculation_data <- eventReactive(
+  input$run_button_matrix_calculation, {
+    Mk <- function(k, mi_3) {
+      M <- matrix(data = rep(0, 5^2), nrow = 5, ncol = 5)
+      #M[] <- 0.2
+      M[1,] <- c(0.4, 0.0, 0.2, 0.0, 0.4)
+      M[2,] <- c(0.0, 0.4, 0.2, 0.4, 0.0)
+      M[3,] <- c(0.2, 0.2, 0.2, 0.2, 0.2)
+      M[4,] <- c(0.2, 0.1, 0.3, 0.2, 0.2)
+      M[5,] <- c(0.2, 0.3, 0.1, 0.2, 0.2)
+      M
+    }
+    
+    multi_group_matrizes(input$Ne_matrix, input$t_matrix, Mk)
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  plotlist <- lapply(matrix_calculation_data(), function(x) {
+    ggplot(x, aes(x = Var2, y = Var1)) + 
+      geom_raster(aes(fill=value)) +
+      geom_text(aes(x = Var2, y = Var1, label = round(value, 3)), color = "white", size = 5) +
+      scale_y_reverse(sec.axis = dup_axis()) +
+      scale_x_continuous(sec.axis = dup_axis()) +
+      xlab("group") +
+      ylab("group")
+  })
+
+  cowplot::plot_grid(
+    plotlist = plotlist,
+    labels = c("M", "M'", "U", "V", "SED", "MSD"), 
+    nrow = 3, ncol = 2
+  )
+},
+height = 1200
+)
+``` 
+
+# Woodland Interassemblage Distance
+
+## Trends in Interassemblage Distance
+
+## Diversity and Distance for Individual Assemblages
+
+$$\bar{d}_{i}^{2} = \sum_{j = 1}^{n} d_{ij}^{2} / (n - 1), i \neq j$$
+
+## Diversity and Distance for Individual Assemblages
+
+```{r echo = FALSE}
+inputPanel(
+  sliderInput("k_two_groups_many_runs_with_msd", label = "k",
+               min = 15, max = 25, value = 20, step = 1),
+  sliderInput("N_two_groups_many_runs_with_msd", label = "N",
+               min = 10, max = 100, value = 20, step = 10),
+  sliderInput("t_two_groups_many_runs_with_msd", label = "t",
+               min = 20, max = 200, value = 20, step = 20),
+  sliderInput("mi_two_groups_many_runs_with_msd", label = "mi",
+               min = 0, max = 1, value = 0.1, step = 0.01),
+  sliderInput("sim_runs_two_groups_many_runs_with_msd", label = "Number of simulation runs",
+               min = 1, max = 100, value = 20, step = 1),
+  actionButton("run_button_two_groups_many_runs_with_msd", "Run simulation")
+)
+
+two_groups_many_runs_with_msd_data <- eventReactive(
+  input$run_button_two_groups_many_runs_with_msd, {
+    
+    # read input
+    k <- input$k_two_groups_many_runs_with_msd 
+    N <- input$N_two_groups_many_runs_with_msd 
+    t_final <- input$t_two_groups_many_runs_with_msd
+    mi <- input$mi_two_groups_many_runs_with_msd
+    sim_runs <- input$sim_runs_two_groups_many_runs_with_msd
+    
+    mixed_list <- list()
+    
+    # run group drift simulation
+    res_list <- list()
+    for (i in 1:sim_runs) {
+      res_list[[i]] <- calculate_sed_for_group_drift_simulation_result(
+        group_drift_simulation(
+          k, 
+          N, 
+          t_final, 
+          mi
+        ),
+        sim_run = i
+      ) 
+    }
+    
+    mixed_list[[1]] <- do.call(rbind, res_list)
+    
+    # calculate matrix and mean squared distance
+    Mk_msd <- function(k, mi) {
+      M <- matrix(data = rep(0, 2^2), nrow = 2, ncol = 2)
+      M[1,] <- c(1 - mi, mi)
+      M[2,] <- c(mi, 1 - mi)
+      M
+    }
+    
+    msd <- c() 
+    for (t_m in 0:t_final) {
+      msd[t_m + 1] <- multi_group_matrizes(
+        N, t_m, Mk_msd, mi
+      )$longmosed$value[2]
+    }
+    
+    mixed_list[[2]] <- data.frame(t = 0:t_final, sed = msd)
+    
+    mixed_list
+  },
+  ignoreNULL = FALSE
+)
+
+renderPlot({
+  mixed_list <- two_groups_many_runs_with_msd_data()
+  
+  ggplot() +
+    geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
+    geom_hline(aes(yintercept = 2), color = "dodgerblue4") +
+    geom_line(
+      data = mixed_list[[1]], 
+      aes(x = t, y = sed, group = sim_run), 
+      color = "black", size = 1, alpha = 0.3
+    ) +
+    geom_point(
+      data = mixed_list[[1]],
+      aes(x = t, y = sed), 
+      color = "black", size = 1
+    ) +
+    geom_line(
+      data = mixed_list[[2]], 
+      aes(x = t, y = sed), 
+      color = "dodgerblue4", size = 2
+    ) +
+    theme_bw() +
+    xlab(latex2exp::TeX("t")) +
+    ylab(latex2exp::TeX("d_{ij}^2"))
+})
+```
