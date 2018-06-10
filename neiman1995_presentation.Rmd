@@ -727,6 +727,7 @@ renderText({
 
 ## Archaeological Sample Size
 
+<<<<<<< HEAD
 $t_E$ may yield wrong estimates of $θ$ for very large archaeological samples that accumulated over long periods of time.
 
 Equation (9) implies that for a given number of variants $k$, $t_E$ will decline as the sample size $n$ increases. Usually $n$ is limited by the population size $N$, but in case of a long-term sample this limit can be exceeded: $n$ can grow beyond $N$ and causes the estimate of $θ$ to be too low. 
@@ -742,12 +743,23 @@ The innovation rate $μ$ includes the combined effects of both in situ innovatio
 $v$ should be roughly constant across demes, but $m$ is likely to be more variable in time and space. Under these circumstances, most of the variation in $θ$ associated with $μ$ will be caused by variation in intergroup transmission rates. 
 
 $θ$ mostly depends on the number of times local group members learn from members of other groups: $N_e m$. That means that variation in $θ$ is an indicator for the absolute amount of cultural transmission among demes in a geographical region. 
+=======
+$t_E$ may yield wrong estimates of $θ$ for very large archaeological samples that accumulated over long periods of time. Equation (9) implies that for a given number of variants $k$, $t_E$ will decline as the sample size $n$ increases. Usually $n$ is limited by the population size $N$, but in case of a long-term sample this limit can be exceeded: $n$ can grow beyond $N$ and causes the estimate of $θ$ to be too low. In this case $t_F$ can again be the better function to determine $θ$. Another solution is to look at the difference between both estimators ($t_F - t_E$) as a function of assemblage size. For the application in archaeological contexts it's always important to carefully examine the relationships among $t_F$ and $t_E$ and possible sample size effects.
+
+## Inferences About Group Size and Innovation Rate
+
+$θ$ is defined as twice the effective population size times the innovation rate ($2 N_e μ$). The innovation rate $μ$ includes the combined effects of both in situ innovation $v$ and the introduction of novel variants from other groups $m$. If $μ = v + m$, then $N_e μ = N_e v + N_e m$. $v$ should be roughly constant across demes, but $m$ is likely to be more variable in time and space. Under these circumstances, most of the variation in $θ$ associated with $μ$ will be caused by variation in intergroup transmission rates. $θ$ mostly depends on the number of times local group members learn from members of other groups: $N_e m$. That means that variation in $θ$ is an indicator for the absolute amount of cultural transmission among demes in a geographical region. 
+>>>>>>> e003e122d4842c2a9801a2bc422bbd46e35a9377
 
 # Drift, Intergroup Transmission, and Interassemblage Distance
 
 ## Dynamics of Stylistic Distance between Two Groups
 
+<<<<<<< HEAD
 To compare groups and track the cultural transmission we need a simple **measure of between-group similarity**. One possibility is to look at the **squared Euclidean distance $d_{ij}^2$**. It's the sum of squared differences in variant frequencies $p$ between two groups $i$ and $j$. 
+=======
+To compare groups and track the cultural transmission we need a simple measure of between-group similarity. One possibility is to look at the squared Euclidean distance $d_{ij}^2$. It's the sum of squared differences in variant frequencies $p$ between two groups $i$ and $j$. 
+>>>>>>> e003e122d4842c2a9801a2bc422bbd46e35a9377
 
 $$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
 
