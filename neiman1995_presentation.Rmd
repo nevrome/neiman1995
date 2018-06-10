@@ -30,7 +30,9 @@ purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 
 *This document visualizes the simulations and the general model functions in Fraser D. Neimans article Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages [@neiman_stylistic_1995].*
 
-*It mirrors the structure of the article and should be read in conjunction with it. It can be used to deepen the understanding of the complex variable relations, but it doesn't attempt to retell the story: the case study about woodland pottery isn't relevant here. The small descriptive texts are compiled from the article and also contain sentences copied verbatimly. I focused on the segments and explanations I considered most important for understanding the models and parameters. This document does not attempt to reach the threshold of orginality but is meant as a mere tool for learning and teaching.*
+**Abstract**
+
+> Certain aspects of what archaeologists have traditionally called stylistic variation can be understood as the rresult of the introduction of selectively neutral variation into social-learning populations and the sampling error in the cultural transmission of that variation (drift). Simple mathematical models allow the deduction of expectation for the dynamics of these evolutionary mechanisms as monitored in the archaeological record through assemblage diversity and interassemblage distance. The models are applied to make inferences about the causes of change in decorative diversity and interassemblage distance for Woodland ceramics from Illinois.
 
 # Drift, Innovation and Diversity
 
@@ -38,7 +40,7 @@ purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 
 **Drift** is sampling error that accompanies all forms of cultural transmission and **causes individual variants to vanish or dominate randomly**. The speed with which the variation is destroyed increases as the population size decreases. 
 
-Mechanics of the simulation:    
+Mechanics of the following simulation:    
 In each time step every individual randomly adopts a variant from somebody else. The probability of getting somebody else's variant is $(N - 1) / N$ while the probability of keeping the own variant is only $1 / N$. 
 
 - $k$: Amount of variants in a population
@@ -75,7 +77,7 @@ drift_simulation_data <- eventReactive(
     pop0 <- tibble::tibble(
       time = as.integer(0),
       individual = 1:N,
-      variant = rep_len(1:k, N)
+      variant = rep_len(variants, N)
     )
     
     # list to store population stages over time
@@ -129,8 +131,17 @@ renderPlot({
 
 ## Homogeneity Under Drift
 
-- $F_t$: Within-population homogeneity. That's the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant at a certain time step
+The theory of neutral alleles allows to describe the **within-population homogeneity $F$** as a function of the effective population size $N_e$. 
+
+$$F_t = \frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}$$
+
+- $F_t$: Within-population homogeneity. Calculated as the probability that two randomly chosen individuals in the population carry variants that are copies of a common antecedent variant at a certain time step
+
+In a given time period the probability of drawing an individual, who learned from the same model as some other randomly selected individual in the previous time period, is $1 / N$. The probability of the opposite is $1 - (1 / N)$. 
+
 - $F_{t - 1}$: Probability that the model of the second individual learned from the same model as the model of the first individual in an earlier time step
+
+As an effect of drift, $F_t$ approaches one as $t$ increases.
 
 ## Homogeneity Under Drift
 
@@ -177,7 +188,14 @@ renderPlot({
 
 ## Temporal Dynamics of Drift and Innovation
 
+The effect of **drift** on **homongeneity** shrinks if **innovation** is possible.
+
+Mechanics of the folowing simulation:    
+The simulation works like the first one, but now there's a chance of $μ$ for every individual in every time step to create a new variant.
+
 - $μ$: Innovation rate. Probability of the creation of a new variant
+
+The effect of drift is still strongly visible, but with increasing $μ$ it becomes less relevant. New variants can form and replace the dominant one. 
 
 ## Temporal Dynamics of Drift and Innovation
 
@@ -277,6 +295,12 @@ renderPlot({
 
 ## Homogeneity Under Drift and Innovation
 
+Drift and innovation are opposing forces: **drift increases homogeneity and innovation decreases it**. 
+
+This causes an **equilibrium** after some time steps in the simulation. 
+
+We can incorporate innovation into the calculation of $F$ by modifying equation (1). 
+
 $$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
 
 ## Homogeneity Under Drift and Innovation
@@ -327,6 +351,18 @@ renderPlot({
 
 ## Homogeneity Under Drift and Innovation
 
+$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
+
+The equilibrium is reached, when $F_t = F_{t-1}$. Setting $F_t = F_{t-1}$ in equation (2) defines $\hat{F}$.
+
+$$\hat{F} = \frac{(1 - μ)^2}{N_e} - (N_e - 1)(1 - μ)^2$$
+
+If we assume $μ$ is quite small we can further simplify this definition.
+
+$$\hat{F} \simeq \frac{1}{2 N_e μ + 1}$$
+
+That means **the homogeneity of neutral variants within a population is inversely proportional to twice the effective population size times the innovation rate**: $2*N_e*μ$. This expression will be called $θ$.
+
 - $θ$: Twice the effective population size times the innovation rate ($2 N_e μ$)
 
 ## Homogeneity Under Drift and Innovation
@@ -370,6 +406,17 @@ renderPlot({
 ```
 
 ## Homogeneity Under Drift and Innovation
+
+The **homogeneity $\hat{F}$** of a population can also be described as a **function of the relative frequency of the variants in it**: $p$. 
+
+$p_i$ is the relative frequency of the $i$'th variant in the population, so $p$ is a vector of frequencies with the sum one. The probability of choosing a given variant at random is its relative frequency $p_i$, which is also the probability of picking another copy of this same variant on the second try. The probability of getting this variant twice in a row is therefore $p_i^2$. 
+
+The total probability of getting any of the $i = 1$ to $k$ variants twice in a row is the sum of all these probabilities.
+
+$$\hat{F} = \sum_{i=1}^{k} p^2_i$$
+
+Mechanics of the following simulation:    
+$p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $\hat{F}$ the ribbon the min and max results.
 
 - $p_i$: relative frequency of the $i$'th variant in the population 
 
@@ -431,6 +478,10 @@ renderPlot({
 
 ## Diversity
 
+Instead of looking at homogeneity we can also estimate the **diversity inside a population**. One measure of diversity is the **"effective number" of variants $n_e$**, which is the reciprocal of $\hat{F}$. 
+
+$n_e$ scales linearly with $θ$. Larger populations contain more diversity at a given level of innovation. Greater diversity is also expected in populations into which new variants are being introduced at higher rates. 
+
 $$n_e = 2 N_e μ + 1$$
 
 - $n_e$: Effective number of variants
@@ -474,9 +525,20 @@ renderPlot({
 
 ## Diversity
 
-$$n_e = 2 N_e μ + 1$$
+**$θ$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population**. 
 
-- $n_e$: Effective number of variants
+$$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
+
+We can call such estimates $t_F$, to distinguish them from the actual population values and to remind ourselves that they are based on the homogeneity $\hat{F}$ in Equation (5). 
+
+$$\hat{F} = \sum_{i=1}^{k} p^2_i$$
+
+With this equation we can get useful insights into variations in $θ$ among groups or demes.
+
+Mechanics of the following simulation:    
+$p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $t_F$, the ribbon the min and max results.
+
+- $t_F$: Estimated $θ$ by the sum of squares of variant frequencies
 
 ## Diversity
 
