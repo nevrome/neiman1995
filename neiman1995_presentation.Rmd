@@ -1,5 +1,5 @@
 ---
-title: "Neiman 1995: 'Stylistic variation in evolutionary perspective'"
+title: "'Stylistic variation in evolutionary perspective'"
 author: "Clemens Schmid"
 date: "Juni 2018"
 output: 
@@ -26,9 +26,20 @@ suppressMessages(library(expm))
 purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 ```
 
+## Disclaimer
+
+*This document visualizes the simulations and the general model functions in Fraser D. Neimans article Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages [@neiman_stylistic_1995].*
+
+*It mirrors the structure of the article and should be read in conjunction with it. It can be used to deepen the understanding of the complex variable relations, but it doesn't attempt to retell the story: the case study about woodland pottery isn't relevant here. The small descriptive texts are compiled from the article and also contain sentences copied verbatimly. I focused on the segments and explanations I considered most important for understanding the models and parameters. This document does not attempt to reach the threshold of orginality but is meant as a mere tool for learning and teaching.*
+
 # Drift, Innovation and Diversity
 
 ## Temporal Dynamics of Drift
+
+**Drift** is sampling error that accompanies all forms of cultural transmission and **causes individual variants to vanish or dominate randomly**. The speed with which the variation is destroyed increases as the population size decreases. 
+
+Mechanics of the simulation:    
+In each time step every individual randomly adopts a variant from somebody else. The probability of getting somebody else's variant is $(N - 1) / N$ while the probability of keeping the own variant is only $1 / N$. 
 
 - $k$: Amount of variants in a population
 - $N_e$: Size of the effective population. The effective population consists of the individuals within a population that is actively involved in a cultural transmission process
@@ -1025,3 +1036,5 @@ renderPlot({
     ylab(latex2exp::TeX("d_{ij}^2"))
 })
 ```
+
+## References
