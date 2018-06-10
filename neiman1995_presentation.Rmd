@@ -599,66 +599,27 @@ renderPlot({
 
 ## Diversity and Sample Size
 
+The **frequency of variants** in a population of social learners is not equal to the **frequency preserved and documented** in the **archaeological assemblage**. Under appropriate taphonomic circumstances, however, they are surprisingly similar. 
+
+Another problem arises because we try to estimate diversity only on the basis of a **sample derived from a population**. The equations (5) and (7) are similar to the Shannon-Weaver information statistic, which is very sensitive to sample-size variation.
+
+$$\hat{F} = \sum_{i=1}^{k} p^2_i$$
+
+$$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
+
 $$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
 
 - $H$: [Shannon's diversity index](http://www.tiem.utk.edu/~gross/bioed/bealsmodules/shannonDI.html)
 
 ## Diversity and Sample Size
 
-```{r echo=FALSE}
-H <- function(amount_of_variants) {
-  p <- runif(amount_of_variants)
-  p <- p / sum(p)
-  -sum(p * log(p))
-}
+(7) shows how $θ$ is related to the sum of squared variant frequencies in a population, so it should be possible to **predict for a given value of $θ$ how many variants occur with certain frequencies**. 
+ 
+$$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
 
-inputPanel(
-  sliderInput("k_shannon", label = "k",
-               min = 50, max = 150, value = 100, step = 10),
-  sliderInput("number_of_replications_shannon", label = "Number of simulation runs",
-               min = 100, max = 1000, value = 500, step = 100),
-  actionButton("run_button_shannon", "Run simulation")
-)
+When $θ$ is low ($θ \ll 1$), we should expect that most of the time, a population will be dominated by a few variants, with other variants at low frequencies. When $θ$ is high ($θ \gg 1$), we are more likely to see a large number of variants at low to moderate frequencies. 
 
-shannon_data <- eventReactive(
-  input$run_button_shannon, {
-  
-    # read input  
-    number_of_replications <- input$number_of_replications_shannon
-    k <- input$k_shannon
-    
-    # calculate Fhat
-    tibble::tibble(
-      k = 0:k,
-      H_min = sapply(k, function(x) {
-        min(replicate(number_of_replications, H(x)))
-      }),
-      H_max = sapply(k, function(x) {
-        max(replicate(number_of_replications, H(x)))
-      }),
-      H_mean = (H_min + H_max) / 2
-    ) 
-    
-  },
-  ignoreNULL = FALSE
-)
-
-renderPlot({
-  shannon_data() %>%
-    ggplot() +    
-      geom_hline(aes(yintercept = 0), color = "dodgerblue4") +
-      geom_ribbon(
-        aes(x = k, ymin = H_min, ymax = H_max), 
-        fill = "deepskyblue", alpha = 0.5
-      ) +
-      geom_line(aes(x = k, y = H_mean), color = "black", size = 1) +
-      theme_bw() +
-      xlab(latex2exp::TeX("k")) +
-      ylab(latex2exp::TeX("H"))
-})
-```
-
-## Diversity and Sample Size
+By combining this frequency distribution with the probability that a variant at a given frequency is represented at least once in a sample of a given size drawn at random from the population, it should be possible to deduce how many different variants we can expect to find in a sample of a given size. If the variants are selectively neutral, the expected number of different variants $k$ found in a sample drawn from a population is a function of it's sample size $n$ and $θ$ value. The number of variants will be larger when either $θ$ or $n$ are large.
 
 $$E(k) = \sum_{i = 0}^{n - 1} \frac{θ}{θ + i}$$
 
@@ -712,6 +673,14 @@ renderPlot({
 
 ## Diversity and Sample Size
 
+This could be used to produce a **maximum likelihood estimate of $θ$**, that is the value of $θ$ that maximizes the chances of drawing the observed number of variants $k$ in a sample of the size $n$. 
+
+Unfortunately it doesn't have an analytic solution, but we can still use it to estimate $θ$ iteratively by changing its value until $E(k)$ equals the observed number of variants. 
+
+We call the result of doing so $t_E$. Both $t_E$ and $t_F$ offer us special statistical summaries of assemblage diversity, but there are theoretical reasons to prefer $t_E$ if $n$ and $k$ (and not just $p$) are known. 
+
+The following applet allows to solve (9) for theta approximately. It starts at $θ = 10$, changes it in steps of $0.1$ and stops when $|E(k) - k| < 0.5$.
+
 ## Diversity and Sample Size
 
 ```{r echo=FALSE}
@@ -758,11 +727,17 @@ renderText({
 
 ## Archaeological Sample Size
 
+$t_E$ may yield wrong estimates of $θ$ for very large archaeological samples that accumulated over long periods of time. Equation (9) implies that for a given number of variants $k$, $t_E$ will decline as the sample size $n$ increases. Usually $n$ is limited by the population size $N$, but in case of a long-term sample this limit can be exceeded: $n$ can grow beyond $N$ and causes the estimate of $θ$ to be too low. In this case $t_F$ can again be the better function to determine $θ$. Another solution is to look at the difference between both estimators ($t_F - t_E$) as a function of assemblage size. For the application in archaeological contexts it's always important to carefully examine the relationships among $t_F$ and $t_E$ and possible sample size effects.
+
 ## Inferences About Group Size and Innovation Rate
+
+$θ$ is defined as twice the effective population size times the innovation rate ($2 N_e μ$). The innovation rate $μ$ includes the combined effects of both in situ innovation $v$ and the introduction of novel variants from other groups $m$. If $μ = v + m$, then $N_e μ = N_e v + N_e m$. $v$ should be roughly constant across demes, but $m$ is likely to be more variable in time and space. Under these circumstances, most of the variation in $θ$ associated with $μ$ will be caused by variation in intergroup transmission rates. $θ$ mostly depends on the number of times local group members learn from members of other groups: $N_e m$. That means that variation in $θ$ is an indicator for the absolute amount of cultural transmission among demes in a geographical region. 
 
 # Drift, Intergroup Transmission, and Interassemblage Distance
 
 ## Dynamics of Stylistic Distance between Two Groups
+
+To compare groups and track the cultural transmission we need a simple measure of between-group similarity. One possibility is to look at the squared Euclidean distance $d_{ij}^2$. It's the sum of squared differences in variant frequencies $p$ between two groups $i$ and $j$. 
 
 $$d_{ij}^2 = \sum_{k = 1}^{n} (p_{ik} - p_{jk})^2$$
 
