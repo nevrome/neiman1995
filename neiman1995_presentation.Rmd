@@ -89,8 +89,9 @@ The main mechanisms of diffusion of neutral variants are **innovation**, **drift
 
 **Drift** is sampling error that accompanies all forms of cultural transmission and **causes individual variants to vanish or dominate randomly**. The speed with which the variation is destroyed increases as the population size decreases. 
 
-Mechanics of the following simulation:    
+<span style="color:red">Mechanics of the following simulation: 
 In each time step every individual randomly adopts a variant from somebody else. The probability of getting somebody else's variant is $(N - 1) / N$ while the probability of keeping the own variant is only $1 / N$. 
+</span>    
 
 - $k$: Amount of variants in a population
 - $N_e$: Size of the effective population. The effective population consists of the individuals within a population that is actively involved in a cultural transmission process
@@ -239,8 +240,9 @@ renderPlot({
 
 The effect of **drift** on **homongeneity** shrinks if **innovation** is possible.
 
-Mechanics of the folowing simulation:    
+<span style="color:red">Mechanics of the following simulation:      
 The simulation works like the first one, but now there's a chance of $\mu$ for every individual in every time step to create a new variant.
+</span> 
 
 - $\mu$: Innovation rate. Probability of the creation of a new variant
 
@@ -464,8 +466,9 @@ The total probability of getting any of the $i = 1$ to $k$ variants twice in a r
 
 $$\hat{F} = \sum_{i=1}^{k} p^2_i$$
 
-Mechanics of the following simulation:    
+<span style="color:red">Mechanics of the following simulation:    
 $p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $\hat{F}$ the ribbon the min and max results.
+</span>
 
 - $p_i$: relative frequency of the $i$'th variant in the population 
 
@@ -584,8 +587,9 @@ $$\hat{F} = \sum_{i=1}^{k} p^2_i$$
 
 With this equation we can get useful insights into variations in $\theta$ among groups or demes.
 
-Mechanics of the following simulation:    
+<span style="color:red">Mechanics of the following simulation:    
 $p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $t_F$, the ribbon the min and max results.
+</span>
 
 - $t_F$: Estimated $\theta$ by the sum of squares of variant frequencies
 
@@ -857,10 +861,11 @@ Such models reveal what happens to variant frequencies in a finite number of dem
 
 There is no role in these models for in situ innovation, but they offer a means of checking the assumption that variation in $\theta$ is largely a function of intergroup transmission. 
 
-Mechanics of the following simulation:
+<span style="color:red">Mechanics of the following simulation:  
 This simulation is constructed like the very first one about the effects of drift. Only in this case, there is a set probability, the intergroup transmission rate $m_i$, that the individual contacted is derived from the other group. If $m_i = 0$, both groups act independently, but if it increases they tend to develop roughly alike.
 
 The line chart below the variant frequency area plot shows the distance measure $d_{ij}^2$ calculated for the two groups at the respective point in model time.
+</span>
 
 $m_i$: intergroup transmission rate
 
