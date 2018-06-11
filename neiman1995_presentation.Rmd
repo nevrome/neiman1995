@@ -30,9 +30,59 @@ purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
 
 *This document visualizes the simulations and the general model functions in Fraser D. Neimans article Stylistic Variation in Evolutionary Perspective: Inferences from Decorative Diversity and Interassemblage Distance in Illinois Woodland Ceramic Assemblages [@neiman_stylistic_1995].*
 
-**Abstract**
+# Introduction 
 
-> Certain aspects of what archaeologists have traditionally called stylistic variation can be understood as the rresult of the introduction of selectively neutral variation into social-learning populations and the sampling error in the cultural transmission of that variation (drift). Simple mathematical models allow the deduction of expectation for the dynamics of these evolutionary mechanisms as monitored in the archaeological record through assemblage diversity and interassemblage distance. The models are applied to make inferences about the causes of change in decorative diversity and interassemblage distance for Woodland ceramics from Illinois.
+## Introduction
+
+**Cultural Evolution theory**     
+The processes of natural development of species through evolution also affect human cultural development.
+
+> Certain aspects of what archaeologists have traditionally called **stylistic variation** can be understood as the result of the introduction of **selectively neutral variation** into **social-learning populations** and the **sampling error** in the cultural transmission of that variation (**drift**). Simple mathematical models allow the deduction of expectation for the dynamics of these evolutionary mechanisms as monitored in the archaeological record through **assemblage diversity** and **interassemblage distance**. The models are applied to make inferences about the causes of change in decorative diversity and interassemblage distance for **Woodland ceramics from Illinois**.
+>
+> -- @neiman_stylistic_1995, Abstract. (boldface from me)
+
+## Introduction
+
+**Stylistic vs. functional cultural traits**    
+
+> **Style** denotes those forms that do not have detectable selective values. **Function** is manifest as those forms that directly affect the Darwinian fitness of the populations in which they occur.
+>
+> [...]
+>
+> Traits that have discrete selective values over measurable amounts of time should be accountable by natural selection and a set of external conditions. **Traits identified as adaptively neutral will display a very different kind of behavior** because their frequencies in a population are not directly accountable in terms of selection and external contingencies. Their behavior should be more adequately accommodated by **stochastic processes**
+>
+> -- @dunnell1978style, 199. (boldface from me)
+
+## Introduction
+
+**Mechanisms that control the distribution of stylistic variants**    
+
+> In a neo-Darwinian framework these definitions imply that **variation in stylistic variant frequencies in time and space** will be affected by a subset of evolutionary forces that introduce selectively neutral cultural variation into populations of social learners, for example, **innovation** and **intrgroup transmission** [(**flow**)], and then sort it stochastically (**drift**).
+>
+> -- @neiman_stylistic_1995, 8.    
+
+\
+
+The main mechanisms of diffusion of neutral variants are **innovation**, **drift** and **flow**.
+
+## Introduction
+
+**Method?**    
+
+> The signal advantage of embedding style in a Darwinian framework is that it **becomes possible to make and evaluate inferences about what happened in history**. These twin goals are accomplished by developing **models of the operation of different evolutionary forces or mechanisms** defined by theory. Models in turn deliver **expectations concerning spatial and temporal distributions** of elements that result from the operation of different mechanisms. Given a suite of measurements of real-world phenomena or statistical summaries of them, we are in a position to make **inferences about the mechanisms that caused observed values**. The inferences can be checked by developing additional models and expectations, based on independent lines of reasoning. Over the long term, the agreement of independent inferences leads to historical knowledge. **Thus while model building is an abstract enterprise, the payoff is fundamentally pragmatic.**
+>
+> -- @neiman_stylistic_1995, 8.    
+
+\
+
+> The chances of developing a deductively correct answer are increased if we work with **formal models**, capable of representation in either **mathematical formalism** or **computer simulation**, of the evolutionary mechanisms that govern the distribution of selectively neutral forms in time and space.
+>
+> -- @neiman_stylistic_1995, 9.
+
+## Introduction
+
+
+
 
 # Drift, Innovation and Diversity
 
