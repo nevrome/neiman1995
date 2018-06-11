@@ -13,6 +13,8 @@ link-citations: true
 ---
 
 ```{r include=FALSE}
+# start presentation from console: R -e "rmarkdown::run('~/neomod/neiman1995/neiman1995_presentation.Rmd', shiny_args = list(port = 8241, launch.browser = T))"
+
 # knitr chunk settings
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -238,11 +240,11 @@ renderPlot({
 The effect of **drift** on **homongeneity** shrinks if **innovation** is possible.
 
 Mechanics of the folowing simulation:    
-The simulation works like the first one, but now there's a chance of $μ$ for every individual in every time step to create a new variant.
+The simulation works like the first one, but now there's a chance of $\mu$ for every individual in every time step to create a new variant.
 
-- $μ$: Innovation rate. Probability of the creation of a new variant
+- $\mu$: Innovation rate. Probability of the creation of a new variant
 
-The effect of drift is still strongly visible, but with increasing $μ$ it becomes less relevant. New variants can form and replace the dominant one. 
+The effect of drift is still strongly visible, but with increasing $\mu$ it becomes less relevant. New variants can form and replace the dominant one. 
 
 ## Temporal Dynamics of Drift and Innovation
 
@@ -348,7 +350,7 @@ This causes an **equilibrium** after some time steps in the simulation.
 
 We can incorporate innovation into the calculation of $F$ by modifying equation (1). 
 
-$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
+$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - \mu)^2$$
 
 ## Homogeneity Under Drift and Innovation
 
@@ -398,19 +400,19 @@ renderPlot({
 
 ## Homogeneity Under Drift and Innovation
 
-$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - μ)^2$$
+$$F_t = \left(\frac{1}{N_e} + \left(1 - \frac{1}{N_e} \right) F_{t-1}\right)(1 - \mu)^2$$
 
 The equilibrium is reached, when $F_t = F_{t-1}$. Setting $F_t = F_{t-1}$ in equation (2) defines $\hat{F}$.
 
-$$\hat{F} = \frac{(1 - μ)^2}{N_e} - (N_e - 1)(1 - μ)^2$$
+$$\hat{F} = \frac{(1 - \mu)^2}{N_e} - (N_e - 1)(1 - \mu)^2$$
 
-If we assume $μ$ is quite small we can further simplify this definition.
+If we assume $\mu$ is quite small we can further simplify this definition.
 
-$$\hat{F} \simeq \frac{1}{2 N_e μ + 1}$$
+$$\hat{F} \simeq \frac{1}{2 N_e \mu + 1}$$
 
-That means **the homogeneity of neutral variants within a population is inversely proportional to twice the effective population size times the innovation rate**: $2*N_e*μ$. This expression will be called $θ$.
+That means **the homogeneity of neutral variants within a population is inversely proportional to twice the effective population size times the innovation rate**: $2*N_e*\mu$. This expression will be called $\theta$.
 
-- $θ$: Twice the effective population size times the innovation rate ($2 N_e μ$)
+- $\theta$: Twice the effective population size times the innovation rate ($2 N_e \mu$)
 
 ## Homogeneity Under Drift and Innovation
 
@@ -527,9 +529,9 @@ renderPlot({
 
 Instead of looking at homogeneity we can also estimate the **diversity inside a population**. One measure of diversity is the **"effective number" of variants $n_e$**, which is the reciprocal of $\hat{F}$. 
 
-$n_e$ scales linearly with $θ$. Larger populations contain more diversity at a given level of innovation. Greater diversity is also expected in populations into which new variants are being introduced at higher rates. 
+$n_e$ scales linearly with $\theta$. Larger populations contain more diversity at a given level of innovation. Greater diversity is also expected in populations into which new variants are being introduced at higher rates. 
 
-$$n_e = 2 N_e μ + 1$$
+$$n_e = 2 N_e \mu + 1$$
 
 - $n_e$: Effective number of variants
 
@@ -572,7 +574,7 @@ renderPlot({
 
 ## Diversity
 
-**$θ$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population**. 
+**$\theta$ can be estimated empirically by computing the reciprocal of the sum of squares of variant frequencies in a population**. 
 
 $$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
 
@@ -580,12 +582,12 @@ We can call such estimates $t_F$, to distinguish them from the actual population
 
 $$\hat{F} = \sum_{i=1}^{k} p^2_i$$
 
-With this equation we can get useful insights into variations in $θ$ among groups or demes.
+With this equation we can get useful insights into variations in $\theta$ among groups or demes.
 
 Mechanics of the following simulation:    
 $p$ is randomly drawn some hundred times from a uniform distribution for every value of $k$. The black line shows the mean result for $t_F$, the ribbon the min and max results.
 
-- $t_F$: Estimated $θ$ by the sum of squares of variant frequencies
+- $t_F$: Estimated $\theta$ by the sum of squares of variant frequencies
 
 ## Diversity
 
@@ -660,15 +662,15 @@ $$H = -\sum_{i = 1}^{k} p_i \log(p_i)$$
 
 ## Diversity and Sample Size
 
-(7) shows how $θ$ is related to the sum of squared variant frequencies in a population, so it should be possible to **predict for a given value of $θ$ how many variants occur with certain frequencies**. 
+$\theta$ is related to the sum of squared variant frequencies in a population, so it should be possible to **predict for a given value of $\theta$ how many variants occur with certain frequencies**. 
  
 $$t_F = \frac{1}{\sum_{i=1}^{k} p^2_i} - 1$$
 
-When $θ$ is low ($θ \ll 1$), we should expect that most of the time, a population will be dominated by a few variants, with other variants at low frequencies. When $θ$ is high ($θ \gg 1$), we are more likely to see a large number of variants at low to moderate frequencies. 
+When $\theta$ is low ($\theta \ll 1$), we should expect that most of the time, a population will be dominated by a few variants, with other variants at low frequencies. When $\theta$ is high ($\theta \gg 1$), we are more likely to see a large number of variants at low to moderate frequencies. 
 
-By combining this frequency distribution with the probability that a variant at a given frequency is represented at least once in a sample of a given size drawn at random from the population, it should be possible to deduce how many different variants we can expect to find in a sample of a given size. If the variants are selectively neutral, the expected number of different variants $k$ found in a sample drawn from a population is a function of it's sample size $n$ and $θ$ value. The number of variants will be larger when either $θ$ or $n$ are large.
+If the variants are selectively neutral, the expected number of different variants $k$ found in a sample drawn from a population is a function of it's sample size $n$ and $\theta$ value. The number of variants will be larger when either $\theta$ or $n$ are large.
 
-$$E(k) = \sum_{i = 0}^{n - 1} \frac{θ}{θ + i}$$
+$$E(k) = \sum_{i = 0}^{n - 1} \frac{\theta}{\theta + i}$$
 
 - $E(k)$: Expected number of different variants
 - $n$: Sample size
@@ -720,13 +722,13 @@ renderPlot({
 
 ## Diversity and Sample Size
 
-This could be used to produce a **maximum likelihood estimate of $θ$**, that is the value of $θ$ that maximizes the chances of drawing the observed number of variants $k$ in a sample of the size $n$. 
+This could be used to produce a **maximum likelihood estimate of $\theta$**, that is the value of $\theta$ that maximizes the chances of drawing the observed number of variants $k$ in a sample of the size $n$. 
 
-Unfortunately it doesn't have an analytic solution, but we can still use it to estimate $θ$ iteratively by changing its value until $E(k)$ equals the observed number of variants. 
+Unfortunately it doesn't have an analytic solution, but we can still use it to estimate $\theta$ iteratively by changing its value until $E(k)$ equals the observed number of variants. 
+
+The following applet allows to solve (9) for theta approximately. It starts at $\theta = 10$, changes it in steps of $0.1$ and stops when $|E(k) - k| < 0.5$.
 
 We call the result of doing so $t_E$. Both $t_E$ and $t_F$ offer us special statistical summaries of assemblage diversity, but there are theoretical reasons to prefer $t_E$ if $n$ and $k$ (and not just $p$) are known. 
-
-The following applet allows to solve (9) for theta approximately. It starts at $θ = 10$, changes it in steps of $0.1$ and stops when $|E(k) - k| < 0.5$.
 
 ## Diversity and Sample Size
 
@@ -774,21 +776,21 @@ renderText({
 
 ## Archaeological Sample Size
 
-$t_E$ may yield wrong estimates of $θ$ for very large archaeological samples that accumulated over long periods of time.
+$t_E$ may yield wrong estimates of $\theta$ for very large archaeological samples that accumulated over long periods of time.
 
-Equation (9) implies that for a given number of variants $k$, $t_E$ will decline as the sample size $n$ increases. Usually $n$ is limited by the population size $N$, but in case of a long-term sample this limit can be exceeded: $n$ can grow beyond $N$ and causes the estimate of $θ$ to be too low. 
+Equation (9) implies that for a given number of variants $k$, $t_E$ will decline as the sample size $n$ increases. Usually $n$ is limited by the population size $N$, but in case of a long-term sample this limit can be exceeded: $n$ can grow beyond $N$ and causes the estimate of $\theta$ to be too low. 
 
-In this case $t_F$ can again be the better function to determine $θ$. Another solution is to look at the difference between both estimators ($t_F - t_E$) as a function of assemblage size. For the application in archaeological contexts it's always important to carefully examine the relationships among $t_F$ and $t_E$ and possible sample size effects.
+In this case $t_F$ can again be the better function to determine $\theta$. Another solution is to look at the difference between both estimators ($t_F - t_E$) as a function of assemblage size. For the application in archaeological contexts it's always important to carefully examine the relationships among $t_F$ and $t_E$ and possible sample size effects.
 
 ## Inferences About Group Size and Innovation Rate
 
-$θ$ is defined as twice the effective population size times the innovation rate ($2 N_e μ$). 
+$\theta$ is defined as twice the effective population size times the innovation rate ($2 N_e \mu$). 
 
-The innovation rate $μ$ includes the combined effects of both in situ innovation $v$ and the introduction of novel variants from other groups $m$. If $μ = v + m$, then $N_e μ = N_e v + N_e m$. 
+The innovation rate $\mu$ includes the combined effects of both in situ innovation $v$ and the introduction of novel variants from other groups $m$. If $\mu = v + m$, then $N_e \mu = N_e v + N_e m$. 
 
-$v$ should be roughly constant across demes, but $m$ is likely to be more variable in time and space. Under these circumstances, most of the variation in $θ$ associated with $μ$ will be caused by variation in intergroup transmission rates. 
+$v$ should be roughly constant across demes, but $m$ is likely to be more variable in time and space. Under these circumstances, most of the variation in $\theta$ associated with $\mu$ will be caused by variation in intergroup transmission rates. 
 
-$θ$ mostly depends on the number of times local group members learn from members of other groups: $N_e m$. That means that variation in $θ$ is an indicator for the absolute amount of cultural transmission among demes in a geographical region. 
+$\theta$ mostly depends on the number of times local group members learn from members of other groups: $N_e m$. That means that variation in $\theta$ is an indicator for the absolute amount of cultural transmission among demes in a geographical region. 
 
 # Drift, Intergroup Transmission, and Interassemblage Distance
 
@@ -853,7 +855,7 @@ The study of intergroup cultural transmission requires a model setup that contai
 
 Such models reveal what happens to variant frequencies in a finite number of demes that are subject to the joint effects of drift, whose strength is controlled by the effective size of each population, and intergroup transmission, occurring between demes at constant pairwise rates. 
 
-There is no role in these models for in situ innovation, but they offer a means of checking the assumption that variation in $θ$ is largely a function of intergroup transmission. 
+There is no role in these models for in situ innovation, but they offer a means of checking the assumption that variation in $\theta$ is largely a function of intergroup transmission. 
 
 Mechanics of the following simulation:
 This simulation is constructed like the very first one about the effects of drift. Only in this case, there is a set probability, the intergroup transmission rate $m_i$, that the individual contacted is derived from the other group. If $m_i = 0$, both groups act independently, but if it increases they tend to develop roughly alike.
@@ -1062,7 +1064,7 @@ height = 1200
 
 ## Trends in Interassemblage Distance
 
-The migration matrix approach can be applied to cultural transmission contexts by computing a matrix of squared Euclidean distances $\mathbf{SED}$ between the groups for each of the variants. We expect to find that the overall level of differentiation among groups, as measured by the mean of the squared Euclidean distances $\mathbf{MSD}$, is the mirror image of our estimates of $θ$.
+The migration matrix approach can be applied to cultural transmission contexts by computing a matrix of squared Euclidean distances $\mathbf{SED}$ between the groups for each of the variants. We expect to find that the overall level of differentiation among groups, as measured by the mean of the squared Euclidean distances $\mathbf{MSD}$, is the mirror image of our estimates of $\theta$.
 
 ## Diversity and Distance for Individual Assemblages
 
