@@ -779,7 +779,7 @@ $m_i$: intergroup transmission rate
 ```{r echo=FALSE}
 inputPanel(
   sliderInput("k_two_groups", label = "k",
-               min = 5, max = 15, value = 10, step = 1),
+               min = 2, max = 10, value = 10, step = 1),
   sliderInput("N_two_groups", label = "N",
                min = 10, max = 100, value = 20, step = 10),
   sliderInput("t_two_groups", label = "t",
@@ -790,7 +790,7 @@ inputPanel(
 )
 
 group_drift_simulation_data <- eventReactive(
-  input$run_button_group_drift_simulation, {
+  input$run_button_two_groups, {
     
     # run simulation (code in source file)
     group_drift_simulation(
