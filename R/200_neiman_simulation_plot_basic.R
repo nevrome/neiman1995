@@ -1,42 +1,68 @@
-model_result <- neiman_simulation(8, 2, 800, 1400, 0.001, 0)
-
-x <- standardize_neiman_output(model_result)
-
 plot_by_group <- function(x) {
 x %>%
 ggplot() +
-  geom_area(aes(x = time, y = frequency, fill = variant, group = variant)) +
-  geom_line(aes(x = time, y = frequency, group = variant), position = "stack") +
+  # geom_area(aes(x = time, y = frequency, fill = variant, group = variant)) +
+  geom_line(aes(x = time, y = frequency, group = variant, color = model_id), position = "stack") +
   facet_wrap(~group, nrow = 8) +
   theme_bw() +
-  xlab("t") +
-  ylab("variants and their occurence in the population [%]") + 
   theme(
     strip.background = element_blank(),
-    strip.text.x = element_blank()
+    strip.text.x = element_blank(),
+    axis.title = element_blank()
+  ) +
+  guides(color = FALSE) +
+  scale_y_continuous(
+    breaks = c(0, 0.5, 1),
+    labels = c("0%", "50%", "100%")
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, 1400, 200), 
+    limits = c(0, 1400)
   )
 }
 
 config_matrix <- tibble::tibble(
-  N = c(10, 100, 300),
+  N = c(10, 50, 100),
   mi = c(0.001, 0.01, 0.1)
 ) %>%
-  tidyr::complete(N, mi)
+  tidyr::complete(N, mi) %>%
+  dplyr::mutate(
+    model_group = 1:nrow(.)
+  ) %>%
+  tidyr::uncount(2) %>%
+  dplyr::mutate(
+    model_id = 1:nrow(.)
+  )
 
 models <- pbapply::pblapply(
   1:nrow(config_matrix),
   function(i, config_matrix) {
-    neiman_simulation(8, 2, config_matrix$N[i], 1400, config_matrix$mi[i], 0) %>% standardize_neiman_output
+    neiman_simulation(8, 2, config_matrix$N[i], 1400, config_matrix$mi[i], 0) %>% standardize_neiman_output %>%
+      dplyr::mutate(model_id = config_matrix$model_id[i], model_group = config_matrix$model_group[i])
   },
   config_matrix
 )
 
+models_groups <- do.call(rbind, models) %>%
+  base::split(.$model_group)
+
+plot_list <- lapply(models_groups, plot_by_group)
+
 plots <- cowplot::plot_grid(
-  plotlist = lapply(models, plot_by_group),
+  plotlist = plot_list,
   labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"), 
   ncol = 3,
   nrow = 3
 )
 
-
+plots %>%
+  ggsave(
+    "static_plots/neiman_general.jpeg",
+    plot = .,
+    device = "jpeg",
+    scale = 1,
+    dpi = 300,
+    width = 210, height = 297, units = "mm",
+    limitsize = F
+  )
 
