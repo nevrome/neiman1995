@@ -71,9 +71,7 @@ The processes of natural development of species through evolution also affect hu
 
 The main mechanisms of diffusion of neutral variants are **innovation**, **drift** and **flow**.
 
-## Introduction
-
-**Method?**    
+## Introduction: Method?
 
 > The signal advantage of embedding style in a Darwinian framework is that it **becomes possible to make and evaluate inferences about what happened in history**. These twin goals are accomplished by developing **models of the operation of different evolutionary forces or mechanisms** defined by theory. Models in turn deliver **expectations concerning spatial and temporal distributions** of elements that result from the operation of different mechanisms. Given a suite of measurements of real-world phenomena or statistical summaries of them, we are in a position to make **inferences about the mechanisms that caused observed values**. The inferences can be checked by developing additional models and expectations, based on independent lines of reasoning. Over the long term, the agreement of independent inferences leads to historical knowledge. **Thus while model building is an abstract enterprise, the payoff is fundamentally pragmatic.**
 >
