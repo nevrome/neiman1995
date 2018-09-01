@@ -1,74 +1,105 @@
-group_drift_simulation <- function(k, N, t_final, mi) {
+neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
 
-  population <- 1:N
+  # define variables
+  groups <- 1:g
+  population <- 1:N_g
   variants <- 1:k
   timesteps <- 2:t_final
-  
-  popA0 <- tibble::tibble(
-    time = as.integer(0),
-    individual = 1:N,
-    variant = rep_len(1:k, N),
-    group = "A"
-  )
-  popB0 <- tibble::tibble(
-    time = as.integer(0),
-    individual = 1:N,
-    variant = rep_len(1:k, N),
-    group = "B"
-  )
-  
-  popA_devel <- list()
-  popB_devel <- list()
-  popA_devel[[1]] <- popA0
-  popB_devel[[1]] <- popB0
-  
-  for (p1 in timesteps) {
-    popA_new <- popA_devel[[p1 - 1]]
-    popB_new <- popB_devel[[p1 - 1]]
-    
-    popA_new$time <- p1 - 1
-    popB_new$time <- p1 - 1
-
-    exchange_here <- sample(
-      c(TRUE, FALSE), 
-      length(popA_new$variant), 
-      prob = c(mi, 1 - mi), 
-      replace = T
+  if (any(is.na(I))) {
+    I <- matrix(
+      rep(1, g*g), g, g
     )
-          
-    popA_old_variant <- popA_new$variant
-    # in group A
-    popA_new$variant <- sample(popA_new$variant, length(popA_new$variant), replace = T)
-    # ex group A
-    popA_new$variant[exchange_here] <- sample(popB_new$variant, sum(exchange_here))
-    # in group B
-    popB_new$variant <- sample(popB_new$variant, length(popB_new$variant), replace = T)
-    # ex group B
-    popB_new$variant[exchange_here] <- sample(popA_old_variant, sum(exchange_here))
-    
-    popA_devel[[p1]] <- popA_new
-    popB_devel[[p1]] <- popB_new
+    diag(I) <- 0
   }
   
-  pop_devel <- append(popA_devel, popB_devel)
+  # create starting populations
+  pop0 <- lapply(
+    groups, function(group, N, k) {
+      tibble::tibble(
+        time = as.integer(0),
+        individual = population,
+        variant = rep_len(variants, max(population)),
+        group = group
+      )
+    },
+    k, population
+  )
   
-  pop_devel_df <- do.call(rbind, pop_devel)
+  # create development list
+  pop_devel <- list()
+  pop_devel[[1]] <- pop0
   
-  pop_devel_sum <- pop_devel_df %>%
-    dplyr::group_by(
-      time, variant, group
-    ) %>%
-    dplyr::summarise(
-      individuals_with_variant = n()
-    ) %>%
-    dplyr::ungroup() %>%
-    # that's just to fil gaps in the area plot
-    tidyr::complete(
-      time, 
-      variant, 
-      group,
-      fill = list(individuals_with_variant = as.integer(0))
+  # simulation loop
+  for (p1 in timesteps) {
+    
+    # new timestep list
+    pop_old <- pop_devel[[p1 - 1]]
+    pop_new <- pop_old
+    
+    # adjust time in new timestep list
+    pop_new <- lapply(
+      pop_new, function(x, p1) {
+        x$time <- p1 - 1
+        return(x)
+      },
+      p1
     )
+    
+    # intragroup learning
+    pop_new <- lapply(
+      pop_new, function(x) {
+        x$variant <- sample(x$variant, length(x$variant), replace = T)
+        return(x)
+      }
+    )
+    
+    # intergroup learning
+    pop_new <- lapply(
+      groups, function(i, pop_new, pop_old, mi, I, groups) {
+        exchange_where <- which(sample(c(TRUE, FALSE), nrow(pop_new[[i]]), prob = c(mi, 1 - mi), replace = T))
+        exchange_with <- sample(groups, length(exchange_where), prob = I[,i], replace = T)
+        pop_new[[i]]$variant[exchange_where] <- unlist(sapply(
+          seq_along(exchange_where),
+          function(j, pop_old, exchange_with, exchange_where) {
+            v <- pop_old[[exchange_with[j]]]$variant
+            return(v[exchange_where[j]])
+          },
+          pop_old, exchange_with, exchange_where
+        ))
+        return(pop_new[[i]])
+      },
+      pop_new, pop_old, mi, I, groups
+    )
+    
+    pop_devel[[p1]] <- pop_new
+  }
   
-  return(pop_devel_sum)
+  # transform to data.frame
+  pop_devel_time_dfs <- lapply(
+    pop_devel, function(x) {
+      do.call(rbind, x)
+    }
+  )
+  pop_devel_df <- do.call(rbind, pop_devel_time_dfs)
+  
+  return(pop_devel_df)
 }
+
+neiman_simulation(8, 5, 20, 1400, 0.1, 0.01)
+
+pop_devel_sum <- pop_devel_df %>%
+  dplyr::group_by(
+    time, variant, group
+  ) %>%
+  dplyr::summarise(
+    individuals_with_variant = n()
+  ) %>%
+  dplyr::ungroup() %>%
+  # that's just to fil gaps in the area plot
+  tidyr::complete(
+    time, 
+    variant, 
+    group,
+    fill = list(individuals_with_variant = as.integer(0))
+  )
+
