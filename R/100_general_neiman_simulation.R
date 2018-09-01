@@ -123,9 +123,3 @@ standardize_neiman_output <- function(x) {
     )
   
 }
-
-model_result <- neiman_simulation(8, 5, 20, 1400, 0.1, 0.001)
-
-res <- standardize_neiman_output(model_result)
-
-
