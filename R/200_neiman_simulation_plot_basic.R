@@ -1,14 +1,24 @@
 plot_by_group <- function(x) {
-x %>%
-ggplot() +
+x %>% 
+  dplyr::filter(
+    variant == 1
+  ) %>%
+  ggplot() +
   # geom_area(aes(x = time, y = frequency, fill = variant, group = variant)) +
-  geom_line(aes(x = time, y = frequency, group = variant, color = model_id), position = "stack") +
+  geom_line(
+    aes(x = time, y = frequency, color = model_id, group = model_id),
+    size = 0.2
+  ) +
   facet_wrap(~group, nrow = 8) +
   theme_bw() +
   theme(
     strip.background = element_blank(),
     strip.text.x = element_blank(),
-    axis.title = element_blank()
+    axis.title = element_blank(),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 8, angle = 45),
+    axis.ticks.y = element_blank(),
+    plot.margin = unit(c(1.5,0.2,0.2,0), "lines")
   ) +
   guides(color = FALSE) +
   scale_y_continuous(
@@ -29,7 +39,7 @@ config_matrix <- tibble::tibble(
   dplyr::mutate(
     model_group = 1:nrow(.)
   ) %>%
-  tidyr::uncount(2) %>%
+  tidyr::uncount(5) %>%
   dplyr::mutate(
     model_id = 1:nrow(.)
   )
@@ -46,13 +56,12 @@ models <- pbapply::pblapply(
 models_groups <- do.call(rbind, models) %>%
   base::split(.$model_group)
 
-plot_list <- lapply(models_groups, plot_by_group)
-
 plots <- cowplot::plot_grid(
-  plotlist = plot_list,
-  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"), 
+  plotlist = lapply(models_groups, plot_by_group),
+  labels = "AUTO", 
   ncol = 3,
-  nrow = 3
+  nrow = 3,
+  align = "v"
 )
 
 plots %>%
