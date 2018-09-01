@@ -96,29 +96,36 @@ neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
   return(pop_devel_df)
 }
 
+standardize_neiman_output <- function(x) {
+  
+  x %>%
+    dplyr::group_by(
+      time, variant, group
+    ) %>%
+    dplyr::summarise(
+      number = n()
+    ) %>%
+    dplyr::ungroup() %>%
+    # calculate proportion
+    dplyr::group_by(
+      time, group
+    ) %>%
+    dplyr::mutate(
+      frequency = number/sum(number)
+    ) %>%
+    dplyr::ungroup() %>%
+    # that's just to fill gaps in the area plot
+    tidyr::complete(
+      time,
+      variant,
+      group,
+      fill = list(number = as.integer(0), frequency = as.double(0))
+    )
+  
+}
+
 model_result <- neiman_simulation(8, 5, 20, 1400, 0.1, 0.001)
 
-pop_devel_sum <- model_result %>%
-  dplyr::group_by(
-    time, variant, group
-  ) %>%
-  dplyr::summarise(
-    number = n()
-  ) %>%
-  dplyr::ungroup() %>%
-  # calculate proportion
-  dplyr::group_by(
-    time, group
-  ) %>%
-  dplyr::mutate(
-    frequency = number/sum(number)
-  ) %>%
-  dplyr::ungroup() %>%
-  # that's just to fill gaps in the area plot
-  tidyr::complete(
-    time,
-    variant,
-    group,
-    fill = list(number = as.integer(0), frequency = as.double(0))
-  )
+res <- standardize_neiman_output(model_result)
+
 
