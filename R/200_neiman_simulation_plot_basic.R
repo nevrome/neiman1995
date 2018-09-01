@@ -6,7 +6,7 @@ x %>%
   ggplot() +
   # geom_area(aes(x = time, y = frequency, fill = variant, group = variant)) +
   geom_line(
-    aes(x = time, y = frequency, color = model_id, group = model_id),
+    aes(x = time, y = frequency, color = as.factor(model_id), group = model_id),
     size = 0.2
   ) +
   facet_wrap(~group, nrow = 8) +
@@ -16,9 +16,9 @@ x %>%
     strip.text.x = element_blank(),
     axis.title = element_blank(),
     axis.text.y = element_blank(),
-    axis.text.x = element_text(size = 8, angle = 45),
+    axis.text.x = element_text(size = 8, angle = 45, hjust = 1),
     axis.ticks.y = element_blank(),
-    plot.margin = unit(c(1.5,0.2,0.2,0), "lines")
+    plot.margin = unit(c(1.4,0.2,0.2,0), "lines")
   ) +
   guides(color = FALSE) +
   scale_y_continuous(
@@ -28,7 +28,8 @@ x %>%
   scale_x_continuous(
     breaks = seq(0, 1400, 200), 
     limits = c(0, 1400)
-  )
+  ) +
+  ggthemes::scale_colour_colorblind()
 }
 
 config_matrix <- tibble::tibble(
