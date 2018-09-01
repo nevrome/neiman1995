@@ -29,6 +29,9 @@ neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
   pop_devel <- list()
   pop_devel[[1]] <- pop0
   
+  # determine number of variants
+  last_variant <- max(do.call(rbind, pop_devel[[1]])$variant)
+  
   # simulation loop
   for (p1 in timesteps) {
     
@@ -71,6 +74,14 @@ neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
       pop_new, pop_old, mi, I, groups
     )
     
+    # innovation
+    for (i in seq_along(groups)) {
+      innovate_where <- which(sample(c(TRUE, FALSE), nrow(pop_new[[i]]), prob = c(mu, 1 - mu), replace = T))
+      new_variants <- seq(last_variant + 1, last_variant + length(innovate_where))
+      last_variant <- last_variant + length(innovate_where)
+      pop_new[[i]]$variant[innovate_where] <- new_variants
+    }
+
     pop_devel[[p1]] <- pop_new
   }
   
@@ -85,7 +96,7 @@ neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
   return(pop_devel_df)
 }
 
-model_result <- neiman_simulation(8, 5, 20, 1400, 0.1, 0.01)
+model_result <- neiman_simulation(8, 5, 20, 1400, 0.1, 0.001)
 
 pop_devel_sum <- model_result %>%
   dplyr::group_by(
