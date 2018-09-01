@@ -8,7 +8,7 @@ output:
     widescreen: true
     smaller: true
 runtime: shiny
-bibliography: references.bib
+bibliography: ../references.bib
 link-citations: true
 ---
 
@@ -25,7 +25,7 @@ library(ggplot2)
 library(magrittr)
 suppressMessages(library(expm))
 # load the functions in the source files
-purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
+purrr::walk(list.files("../R", full.names = T), function(x) {source(x)})
 ```
 
 ## Disclaimer
