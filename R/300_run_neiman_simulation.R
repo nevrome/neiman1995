@@ -26,11 +26,13 @@ models <- pbapply::pblapply(
   1:nrow(config_matrix),
   function(i, config_matrix) {
     neiman_simulation(
-      8, 2, 
-      config_matrix$N[i], 
-      1400, 
+      config_matrix$k[i], 
+      config_matrix$N_g[i], 
+      config_matrix$t_final[i], 
+      config_matrix$mu[i],
+      config_matrix$g[i], 
       config_matrix$mi[i], 
-      0
+      config_matrix$I[i]
     ) %>% standardize_neiman_output %>%
       dplyr::mutate(
         model_id = config_matrix$model_id[i], 
@@ -47,6 +49,7 @@ models_groups <- do.call(rbind, models) %>%
 
 #### create plots ####
 
+library(ggplot2)
 plots <- cowplot::plot_grid(
   plotlist = lapply(models_groups, plot_by_group),
   labels = "AUTO", 
