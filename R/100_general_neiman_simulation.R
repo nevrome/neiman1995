@@ -2,22 +2,22 @@
 
 #' neiman_simulation
 #'
-#' @param g Integer. Number of groups
 #' @param k Integer. Number of variants at t = 0
 #' @param N_g Integer. Population per group
 #' @param t_final Integer. Final timestep
-#' @param mi Double. Degree of intergroup interaction
 #' @param mu Double. Innovation rate
-#' @param I Doublematrix. Intergroup interaction matrix. Default = equal interaction+
+#' @param g Integer. Number of groups
+#' @param mi Double. Degree of intergroup interaction
+#' @param I Doublematrix. Intergroup interaction matrix. Default = NA, that means equal interaction
 #' 
-neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
+neiman_simulation <- function(k, N_g, t_final, mu, g, mi, I = NA) {
 
   # define variables
   groups <- 1:g
   population <- 1:N_g
   variants <- 1:k
   timesteps <- 2:t_final
-  if (any(is.na(I))) {
+  if (is.na(I)) {
     I <- matrix(
       rep(1, g*g), g, g
     )
