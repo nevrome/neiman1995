@@ -8,9 +8,9 @@
 #' @param mu Double. Innovation rate
 #' @param g Integer. Number of groups
 #' @param mi Double. Degree of intergroup interaction
-#' @param I Doublematrix. Intergroup interaction matrix. Default = NA, that means equal interaction
+#' @param I Doublematrix. Intergroup interaction matrix. NA means equal interaction
 #' 
-neiman_simulation <- function(k, N_g, t_final, mu, g, mi, I = NA) {
+neiman_simulation <- function(k, N_g, t_final, mu, g, mi, I) {
 
   # define variables
   groups <- 1:g
