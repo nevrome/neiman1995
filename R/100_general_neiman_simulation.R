@@ -1,5 +1,15 @@
 #### simulation function ####
 
+#' neiman_simulation
+#'
+#' @param g Integer. Number of groups
+#' @param k Integer. Number of variants at t = 0
+#' @param N_g Integer. Population per group
+#' @param t_final Integer. Final timestep
+#' @param mi Double. Degree of intergroup interaction
+#' @param mu Double. Innovation rate
+#' @param I Doublematrix. Intergroup interaction matrix. Default = equal interaction+
+#' 
 neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
 
   # define variables
@@ -77,11 +87,13 @@ neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
     )
     
     # innovation
-    for (i in seq_along(groups)) {
-      innovate_where <- which(sample(c(TRUE, FALSE), nrow(pop_new[[i]]), prob = c(mu, 1 - mu), replace = T))
-      new_variants <- seq(last_variant + 1, last_variant + length(innovate_where))
-      last_variant <- last_variant + length(innovate_where)
-      pop_new[[i]]$variant[innovate_where] <- new_variants
+    if(mu != 0) {
+      for (i in seq_along(groups)) {
+        innovate_where <- which(sample(c(TRUE, FALSE), nrow(pop_new[[i]]), prob = c(mu, 1 - mu), replace = T))
+        new_variants <- seq(last_variant + 1, last_variant + length(innovate_where))
+        last_variant <- last_variant + length(innovate_where)
+        pop_new[[i]]$variant[innovate_where] <- new_variants
+      }
     }
 
     pop_devel[[p1]] <- pop_new
