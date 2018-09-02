@@ -1,3 +1,5 @@
+#### simulation function ####
+
 neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
 
   # define variables
@@ -95,6 +97,10 @@ neiman_simulation <- function(g, k, N_g, t_final, mi, mu, I = matrix()) {
   
   return(pop_devel_df)
 }
+
+
+
+#### output preparation ####
 
 standardize_neiman_output <- function(x) {
   
