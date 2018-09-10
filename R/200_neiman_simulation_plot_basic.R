@@ -3,15 +3,15 @@
 plot_by_group <- function(x) {
 x %>% 
   dplyr::filter(
-    variant == 1
+    idea == 1
   ) %>%
   ggplot() +
-  # geom_area(aes(x = time, y = frequency, fill = variant, group = variant)) +
+  # geom_area(aes(x = timestep, y = proportion, fill = idea, group = idea)) +
   geom_line(
-    aes(x = time, y = frequency, color = as.factor(model_id), group = model_id),
+    aes(x = timestep, y = proportion, color = as.factor(model_id), group = model_id),
     size = 0.2
   ) +
-  facet_wrap(~group, nrow = 8) +
+  facet_wrap(~region, nrow = 8) +
   theme_bw() +
   theme(
     strip.background = element_blank(),
