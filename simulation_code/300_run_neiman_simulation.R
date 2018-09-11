@@ -2,7 +2,7 @@
 
 config_matrix <- expand.grid(
   k = 2,
-  N_g = c(10, 50, 300),
+  N_g = c(50, 250, 500),
   t_final = 1400,
   mu = 0,
   g = 8,

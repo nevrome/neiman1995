@@ -29,7 +29,7 @@ library(ggplot2)
 library(magrittr)
 suppressMessages(library(expm))
 # load the functions in the source files
-purrr::walk(list.files("./R", full.names = T), function(x) {source(x)})
+purrr::walk(list.files("./document_code", full.names = T), function(x) {source(x)})
 ```
 
 ### Drift, Innovation and Diversity
