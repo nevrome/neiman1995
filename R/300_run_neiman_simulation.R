@@ -38,7 +38,7 @@ models <- pbapply::pblapply(
         model_id = config_matrix$model_id[i], 
         model_group = config_matrix$model_group[i],
         region_population_size = config_matrix$N_g[i],
-        degree_interregion_interaction = config_matrix$mi[i],
+        degree_interregion_interaction = config_matrix$mi[i]
       )
   },
   config_matrix
@@ -47,24 +47,18 @@ models <- pbapply::pblapply(
 models_groups <- do.call(rbind, models) %>%
   base::split(.$model_group)
 
-
-
 #### create plots ####
-
-core_plots <- lapply(models_groups, plot_by_group)
-
-plot_labels <- sapply(
-  models_groups, function(x) {
-    rps <- x$region_population_size[1]
-    cui <- x$degree_interregion_interaction[1]
-    paste0(LETTERS[x$model_group[1]], " - ", rps, ", ", cui)
-  }
-)
 
 library(ggplot2)
 complete_plot <- cowplot::plot_grid(
-  plotlist = core_plots,
-  labels = plot_labels,
+  plotlist = lapply(models_groups, plot_by_group),
+  labels = sapply(
+    models_groups, function(x) {
+      rps <- x$region_population_size[1]
+      cui <- x$degree_interregion_interaction[1]
+      paste0(LETTERS[x$model_group[1]], " - ", rps, ", ", cui)
+    }
+  ),
   label_x = 0,
   hjust = 0,
   label_size = 10,
