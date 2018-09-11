@@ -36,7 +36,9 @@ models <- pbapply::pblapply(
     ) %>% standardize_neiman_output %>%
       dplyr::mutate(
         model_id = config_matrix$model_id[i], 
-        model_group = config_matrix$model_group[i]
+        model_group = config_matrix$model_group[i],
+        region_population_size = config_matrix$N_g[i],
+        degree_interregion_interaction = config_matrix$mi[i],
       )
   },
   config_matrix
@@ -49,16 +51,29 @@ models_groups <- do.call(rbind, models) %>%
 
 #### create plots ####
 
-library(ggplot2)
-plots <- cowplot::plot_grid(
-  plotlist = lapply(models_groups, plot_by_group),
-  labels = "AUTO", 
-  ncol = 3,
-  nrow = 3,
-  align = "v"
+core_plots <- lapply(models_groups, plot_by_group)
+
+plot_labels <- sapply(
+  models_groups, function(x) {
+    rps <- x$region_population_size[1]
+    cui <- x$degree_interregion_interaction[1]
+    paste0(LETTERS[x$model_group[1]], " - ", rps, ", ", cui)
+  }
 )
 
-plots %>%
+library(ggplot2)
+complete_plot <- cowplot::plot_grid(
+  plotlist = core_plots,
+  labels = plot_labels,
+  label_x = 0,
+  hjust = 0,
+  label_size = 10,
+  ncol = 3,
+  nrow = 3,
+  align = "hv"
+)
+
+complete_plot %>%
   ggsave(
     "static_plots/neiman_general.jpeg",
     plot = .,
