@@ -2,11 +2,11 @@
 
 config_matrix <- expand.grid(
   k = 2,
-  N_g = c(50, 250, 500),
+  N_g = c(10, 50, 200),
   t_final = 1400,
   mu = 0,
   g = 8,
-  mi = c(0.001, 0.01, 0.1),
+  mi = c(0, 0.01, 0.1),
   I = NA
 ) %>%
   tibble::as.tibble() %>%
