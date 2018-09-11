@@ -6,7 +6,7 @@ config_matrix <- expand.grid(
   t_final = 1400,
   mu = 0,
   g = 8,
-  mi = c(0, 0.01, 0.1),
+  mi = c(0, 0.01, 0.1, 0.5 , 1),
   I = NA
 ) %>%
   tibble::as.tibble() %>%
@@ -41,7 +41,8 @@ models <- pbapply::pblapply(
         degree_interregion_interaction = config_matrix$mi[i]
       )
   },
-  config_matrix
+  config_matrix,
+  cl = 2
 )
 
 models_groups <- do.call(rbind, models) %>%
@@ -51,18 +52,20 @@ models_groups <- do.call(rbind, models) %>%
 
 library(ggplot2)
 complete_plot <- cowplot::plot_grid(
-  plotlist = lapply(models_groups, plot_by_group),
+  plotlist = lapply(models_groups, plot_by_group) %>% 
+    matrix(., 3, 5) %>% t %>% c(),
   labels = sapply(
     models_groups, function(x) {
       rps <- x$region_population_size[1]
       cui <- x$degree_interregion_interaction[1]
       paste0(LETTERS[x$model_group[1]], " - ", rps, ", ", cui)
     }
-  ),
+  ) %>% 
+    matrix(., 3, 5) %>% t %>% c(),
   label_x = 0,
   hjust = 0,
   label_size = 10,
-  ncol = 3,
+  ncol = 5,
   nrow = 3,
   align = "hv"
 )
